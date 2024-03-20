@@ -5,6 +5,7 @@ using System.Reflection.Emit;
 using System;
 using System.Collections.Generic;
 using static System.Formats.Asn1.AsnWriter;
+using BeardDefender_Monogame.GameObjects;
 
 namespace BeardDefender_Monogame
 {
@@ -21,7 +22,8 @@ namespace BeardDefender_Monogame
         Player player1;
         int sharkFrameIndex;
 
-        
+        Texture2D player;
+        Vector2 playerPosition;
 
         //Texture2D player;
 
@@ -45,7 +47,14 @@ namespace BeardDefender_Monogame
 
         protected override void Initialize()
         {
-            groundPosition = new Vector2(0, 400);
+            // Grafik inställningar
+            _graphics.IsFullScreen = false;
+            _graphics.PreferredBackBufferWidth = 1320;
+            _graphics.PreferredBackBufferHeight = 720;
+            _graphics.ApplyChanges();
+
+            // Objekt positioner
+            groundPosition = new Vector2(0, 640);
             groundPositionCon = new Vector2();
             groundPositionNext = new Vector2();
             
@@ -147,39 +156,9 @@ namespace BeardDefender_Monogame
                 Color.White);
 
             // SHAAAARK, beroende på värdet i SharkIsLeft så används rätt sprites.
-            if (!shark.SharkIsLeft)
-            {
-                _spriteBatch.Draw(
-                    shark.TextureLeft[sharkFrameIndex],
-                    shark.Position,
-                    null,
-                    Color.White,
-                    0f,
-                    new Vector2(
-                        shark.Texture.Width / 2,
-                        shark.Texture.Height / 2),
-                    Vector2.One,
-                    SpriteEffects.None,
-                    0f
-                    );
-            }
-            else
-            {
-                _spriteBatch.Draw(
-                shark.TextureRight[sharkFrameIndex],
-                shark.Position,
-                null,
-                Color.White,
-                0f,
-                new Vector2(
-                    shark.Texture.Width / 2,
-                    shark.Texture.Height / 2),
-                Vector2.One,
-                SpriteEffects.None,
-                0f
-                );
-            }
-
+            // Skapa gärna metoder för utritningen av objekt. 
+            shark.DrawShark(_spriteBatch, shark, sharkFrameIndex);
+            
             _spriteBatch.End();
 
             base.Draw(gameTime);
