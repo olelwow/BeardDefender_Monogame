@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Reflection.Emit;
 using System;
 using System.Collections.Generic;
 using static System.Formats.Asn1.AsnWriter;
@@ -9,9 +10,15 @@ namespace BeardDefender_Monogame
 {
     public class Game1 : Game
     {
-        Texture2D player;
+        private Animation idleAnimation;
+        private Animation runAnimation;
+        private Animation currentAnimation;
+        private bool isFacingRight;
+
         Vector2 playerPosition;
-        Vector2 playerPositionNew;
+        float playerSpeed;
+
+        Texture2D player;
 
         Texture2D ground;
         Vector2 groundPosition;
@@ -40,20 +47,32 @@ namespace BeardDefender_Monogame
             groundPositionNext = new Vector2();
             playerPosition = new Vector2(10, 365);
 
+            playerSpeed = 100f;
+
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
+            this.Content.RootDirectory = "Content";
+
+            idleAnimation = new Animation(Content.Load<Texture2D>("Idle-Left"), 0.1f, true);
+            runAnimation = new Animation(Content.Load<Texture2D>("Run-LEFT"), 0.1f, true);
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             player = Content.Load<Texture2D>("Run-Right");
             ground = Content.Load<Texture2D>("ground 10tiles");
             groundCon = Content.Load<Texture2D>("ground 10tiles");
             groundNext = Content.Load<Texture2D>("ground 10tiles");
+
+            currentAnimation = idleAnimation;
+
+            // TODO: use this.Content to load your game content here
         }
 
         protected override void Update(GameTime gameTime)
         {
+            var kstate = Keyboard.GetState();
+
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
                 Exit();
@@ -61,15 +80,17 @@ namespace BeardDefender_Monogame
 
             // Movement settings
             KeyboardState keyboardState = Keyboard.GetState();
-            if (keyboardState.IsKeyDown(Keys.Left))
+            if (keyboardState.IsKeyDown(Keys.Left) || keyboardState.IsKeyDown(Keys.A))
             {
                 playerPosition.X -= 5f;
+                isFacingRight = true;
             }
-            if (keyboardState.IsKeyDown(Keys.Right))
+            if (keyboardState.IsKeyDown(Keys.Right) || keyboardState.IsKeyDown(Keys.D))
             {
                 playerPosition.X += 5f;
+                isFacingRight = false;
             }
-            if (keyboardState.IsKeyDown(Keys.Down))
+            if (keyboardState.IsKeyDown(Keys.Down) || keyboardState.IsKeyDown(Keys.S))
             {
                 playerPosition.Y += 0f;
             }
@@ -78,7 +99,7 @@ namespace BeardDefender_Monogame
                 jumping = true;
             }
 
-            playerPosition.Y += jumpSpeed; 
+            playerPosition.Y += jumpSpeed;
 
             if (jumping == true && gravity < 0)
             {
@@ -113,6 +134,19 @@ namespace BeardDefender_Monogame
                 playerPosition.Y = ground.Bounds.Top - player.Height;
             }
 
+            if (kstate.IsKeyDown(Keys.W) || kstate.IsKeyDown(Keys.Up) || kstate.IsKeyDown(Keys.S) || kstate.IsKeyDown(Keys.Down) || kstate.IsKeyDown(Keys.A) || kstate.IsKeyDown(Keys.Left) || kstate.IsKeyDown(Keys.D) || kstate.IsKeyDown(Keys.Right))
+            {
+                currentAnimation = runAnimation;
+            }
+            else
+            {
+                currentAnimation = idleAnimation;
+            }
+
+            currentAnimation.Update(gameTime);
+
+            // TODO: Add your update logic here
+
             base.Update(gameTime);
         }
 
@@ -122,12 +156,21 @@ namespace BeardDefender_Monogame
 
             _spriteBatch.Begin();
 
-            //Player
+            SpriteEffects spriteEffects = isFacingRight ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
+
+            //Vector2 scale = new Vector2(20f, 20f);
+
             _spriteBatch.Draw(
-                player,
-                playerPosition,
-                new Rectangle(16, 16, 35, 47),
-                Color.White);
+                texture: currentAnimation.Texture,
+                position: playerPosition,
+                sourceRectangle: currentAnimation.CurrentFrameSourceRectangle(),
+                color: Color.White,
+                rotation: 0f,
+                origin: new Vector2(currentAnimation.FrameWidth / 2, currentAnimation.FrameHeight / 2),
+                scale: Vector2.One,
+                effects: spriteEffects,
+                layerDepth: 0f
+            );
 
             //Ground
             _spriteBatch.Draw(
