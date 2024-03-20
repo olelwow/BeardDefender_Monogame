@@ -15,13 +15,13 @@ namespace BeardDefender_Monogame
         private Animation currentAnimation;
         private bool isFacingRight;
 
+
         // Olle :*
         Shark shark;
+        Player player1;
         int sharkFrameIndex;
 
-        Texture2D player;
-        Vector2 playerPosition;
-        float playerSpeed;
+        
 
         //Texture2D player;
 
@@ -34,9 +34,7 @@ namespace BeardDefender_Monogame
 
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        bool jumping = false;
-        int jumpSpeed = 12;
-        float gravity = 12;
+        
 
         public Game1()
         {
@@ -50,10 +48,10 @@ namespace BeardDefender_Monogame
             groundPosition = new Vector2(0, 400);
             groundPositionCon = new Vector2();
             groundPositionNext = new Vector2();
-            playerPosition = new Vector2(10, 365);
+            
             shark = new (new Vector2(100, 100));
-
-            playerSpeed = 100f;
+            player1 = new Player(new Vector2(200, 200));
+            
 
             base.Initialize();
         }
@@ -66,6 +64,11 @@ namespace BeardDefender_Monogame
             runAnimation = new Animation(Content.Load<Texture2D>("Run-LEFT"), 0.1f, true);
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
+
+            //Texturer för player1
+            player1.CurrentAnimation = idleAnimation;
+            player1.RunAnimation = runAnimation;
+            player1.IdleAnimation = idleAnimation;
             // Texturer för shark
             shark.TextureLeft[0] = Content.Load<Texture2D>("wackShark1_left");
             shark.TextureLeft[1] = Content.Load<Texture2D>("wackShark2_left");
@@ -73,7 +76,8 @@ namespace BeardDefender_Monogame
             shark.TextureRight[1] = Content.Load<Texture2D>("wackShark2_right");
             shark.Texture = shark.TextureLeft[0];
 
-            player = Content.Load<Texture2D>("Run-Right");
+            player1.Texture = Content.Load<Texture2D>("Run-Right");
+            
             ground = Content.Load<Texture2D>("ground 10tiles");
             groundCon = Content.Load<Texture2D>("ground 10tiles");
             groundNext = Content.Load<Texture2D>("ground 10tiles");
@@ -97,70 +101,9 @@ namespace BeardDefender_Monogame
 
             // Movement settings
             KeyboardState keyboardState = Keyboard.GetState();
-            if (keyboardState.IsKeyDown(Keys.Left) || keyboardState.IsKeyDown(Keys.A))
-            {
-                playerPosition.X -= 5f;
-                isFacingRight = true;
-            }
-            if (keyboardState.IsKeyDown(Keys.Right) || keyboardState.IsKeyDown(Keys.D))
-            {
-                playerPosition.X += 5f;
-                isFacingRight = false;
-            }
-            if (keyboardState.IsKeyDown(Keys.Down) || keyboardState.IsKeyDown(Keys.S))
-            {
-                playerPosition.Y += 0f;
-            }
-            if (keyboardState.IsKeyDown(Keys.Space))
-            {
-                jumping = true;
-            }
+            isFacingRight = player1.MovePlayer(keyboardState,ground,groundPosition,groundPositionNext,groundNext);
 
-            playerPosition.Y += jumpSpeed;
-
-            if (jumping == true && gravity < 0)
-            {
-                jumping = false;
-            }
-            if (jumping == true)
-            {
-                jumpSpeed = -12; //pushing the player upwards
-                gravity -= 1; //when this value results < 0 then the player goes downwards again
-            }
-            else
-            {
-                jumpSpeed = 12;
-            }
-
-            //Resets the jump and the position of the player
-            if (playerPosition.Y > groundPositionNext.Y && jumping == false)
-            {
-                gravity = 12;
-                playerPosition.Y = 365;
-                jumpSpeed = 0;
-            }
-
-            //Check for collision
-            if (playerPosition.X == groundPositionNext.X)
-            {
-                playerPosition.X = groundPositionNext.X;
-            }
-
-            if (playerPosition.Y - player.Height < ground.Height)
-            {
-                playerPosition.Y = ground.Bounds.Top - player.Height;
-            }
-
-            if (kstate.IsKeyDown(Keys.W) || kstate.IsKeyDown(Keys.Up) || kstate.IsKeyDown(Keys.S) || kstate.IsKeyDown(Keys.Down) || kstate.IsKeyDown(Keys.A) || kstate.IsKeyDown(Keys.Left) || kstate.IsKeyDown(Keys.D) || kstate.IsKeyDown(Keys.Right))
-            {
-                currentAnimation = runAnimation;
-            }
-            else
-            {
-                currentAnimation = idleAnimation;
-            }
-
-            currentAnimation.Update(gameTime);
+            player1.CurrentAnimation.Update(gameTime);
 
             // TODO: Add your update logic here
 
@@ -178,12 +121,12 @@ namespace BeardDefender_Monogame
             //Vector2 scale = new Vector2(20f, 20f);
 
             _spriteBatch.Draw(
-                texture: currentAnimation.Texture,
-                position: playerPosition,
-                sourceRectangle: currentAnimation.CurrentFrameSourceRectangle(),
+                texture: player1.CurrentAnimation.Texture,
+                position: player1.Positions,
+                sourceRectangle: player1.CurrentAnimation.CurrentFrameSourceRectangle(),
                 color: Color.White,
                 rotation: 0f,
-                origin: new Vector2(currentAnimation.FrameWidth / 2, currentAnimation.FrameHeight / 2),
+                origin: new Vector2(player1.CurrentAnimation.FrameWidth / 2, player1.CurrentAnimation.FrameHeight / 2),
                 scale: Vector2.One,
                 effects: spriteEffects,
                 layerDepth: 0f

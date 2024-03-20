@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BeardDefender_Monogame
 {
-    class Animation
+    internal class Animation
     {
         Texture2D texture;
         float frameTime;
