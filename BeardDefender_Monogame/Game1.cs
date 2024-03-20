@@ -15,10 +15,15 @@ namespace BeardDefender_Monogame
         private Animation currentAnimation;
         private bool isFacingRight;
 
+        // Olle :*
+        Shark shark;
+        int sharkFrameIndex;
+
+        Texture2D player;
         Vector2 playerPosition;
         float playerSpeed;
 
-        Texture2D player;
+        //Texture2D player;
 
         Texture2D ground;
         Vector2 groundPosition;
@@ -46,6 +51,7 @@ namespace BeardDefender_Monogame
             groundPositionCon = new Vector2();
             groundPositionNext = new Vector2();
             playerPosition = new Vector2(10, 365);
+            shark = new (new Vector2(100, 100));
 
             playerSpeed = 100f;
 
@@ -59,6 +65,14 @@ namespace BeardDefender_Monogame
             idleAnimation = new Animation(Content.Load<Texture2D>("Idle-Left"), 0.1f, true);
             runAnimation = new Animation(Content.Load<Texture2D>("Run-LEFT"), 0.1f, true);
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            // Texturer för shark
+            shark.TextureLeft[0] = Content.Load<Texture2D>("wackShark1_left");
+            shark.TextureLeft[1] = Content.Load<Texture2D>("wackShark2_left");
+            shark.TextureRight[0] = Content.Load<Texture2D>("wackShark1_right");
+            shark.TextureRight[1] = Content.Load<Texture2D>("wackShark2_right");
+            shark.Texture = shark.TextureLeft[0];
+
             player = Content.Load<Texture2D>("Run-Right");
             ground = Content.Load<Texture2D>("ground 10tiles");
             groundCon = Content.Load<Texture2D>("ground 10tiles");
@@ -77,6 +91,9 @@ namespace BeardDefender_Monogame
             {
                 Exit();
             }
+
+            // Shark movement, returnerar rätt frame index som används i Update.
+            sharkFrameIndex = shark.MoveShark(_graphics, gameTime);
 
             // Movement settings
             KeyboardState keyboardState = Keyboard.GetState();
@@ -185,6 +202,40 @@ namespace BeardDefender_Monogame
                 groundNext,
                 groundPositionNext = new Vector2(ground.Width - 100, 365),
                 Color.White);
+
+            // SHAAAARK, beroende på värdet i SharkIsLeft så används rätt sprites.
+            if (!shark.SharkIsLeft)
+            {
+                _spriteBatch.Draw(
+                    shark.TextureLeft[sharkFrameIndex],
+                    shark.Position,
+                    null,
+                    Color.White,
+                    0f,
+                    new Vector2(
+                        shark.Texture.Width / 2,
+                        shark.Texture.Height / 2),
+                    Vector2.One,
+                    SpriteEffects.None,
+                    0f
+                    );
+            }
+            else
+            {
+                _spriteBatch.Draw(
+                shark.TextureRight[sharkFrameIndex],
+                shark.Position,
+                null,
+                Color.White,
+                0f,
+                new Vector2(
+                    shark.Texture.Width / 2,
+                    shark.Texture.Height / 2),
+                Vector2.One,
+                SpriteEffects.None,
+                0f
+                );
+            }
 
             _spriteBatch.End();
 
