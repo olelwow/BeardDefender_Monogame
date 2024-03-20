@@ -125,21 +125,7 @@ namespace BeardDefender_Monogame
 
             _spriteBatch.Begin();
 
-            SpriteEffects spriteEffects = isFacingRight ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
-
-            //Vector2 scale = new Vector2(20f, 20f);
-
-            _spriteBatch.Draw(
-                texture: player1.CurrentAnimation.Texture,
-                position: player1.Positions,
-                sourceRectangle: player1.CurrentAnimation.CurrentFrameSourceRectangle(),
-                color: Color.White,
-                rotation: 0f,
-                origin: new Vector2(player1.CurrentAnimation.FrameWidth / 2, player1.CurrentAnimation.FrameHeight / 2),
-                scale: Vector2.One,
-                effects: spriteEffects,
-                layerDepth: 0f
-            );
+            player1.DrawPlayer(_spriteBatch,player1);
 
             //Ground
             _spriteBatch.Draw(

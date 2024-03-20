@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 
-namespace BeardDefender_Monogame
+namespace BeardDefender_Monogame.GameObjects
 {
     internal class Player
     {
@@ -24,7 +24,7 @@ namespace BeardDefender_Monogame
         private Animation currentAnimation;
         private Animation idleAnimation;
         private Animation runAnimation;
-       
+
         public Vector2 Positions
         {
             get { return position; }
@@ -110,9 +110,9 @@ namespace BeardDefender_Monogame
                 position.X = groundPositionNext.X;
             }
 
-            if (position.Y - this.texture.Height < ground.Height)
+            if (position.Y - texture.Height < ground.Height)
             {
-                position.Y = ground.Bounds.Top - this.texture.Height;
+                position.Y = ground.Bounds.Top - texture.Height;
             }
             if (keyboardState.IsKeyDown(Keys.W) ||
                 keyboardState.IsKeyDown(Keys.Up) ||
@@ -130,6 +130,25 @@ namespace BeardDefender_Monogame
                 currentAnimation = idleAnimation;
             }
             return isFacingRight;
+        }
+
+        public void DrawPlayer(SpriteBatch _spriteBatch, Player player1 )
+        {
+            SpriteEffects spriteEffects = isFacingRight ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
+
+            //Vector2 scale = new Vector2(20f, 20f);
+
+            _spriteBatch.Draw(
+                texture: player1.CurrentAnimation.Texture,
+                position: player1.Positions,
+                sourceRectangle: player1.CurrentAnimation.CurrentFrameSourceRectangle(),
+                color: Color.White,
+                rotation: 0f,
+                origin: new Vector2(player1.CurrentAnimation.FrameWidth / 2, player1.CurrentAnimation.FrameHeight / 2),
+                scale: Vector2.One,
+                effects: spriteEffects,
+                layerDepth: 0f
+            );
         }
 
     }
