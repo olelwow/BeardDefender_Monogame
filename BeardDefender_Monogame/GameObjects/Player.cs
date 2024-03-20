@@ -15,7 +15,8 @@ namespace BeardDefender_Monogame.GameObjects
 {
     internal class Player
     {
-        private Vector2 position;
+        public Rectangle position;
+        private Rectangle positionNew;
         private bool jumping;
         private int jumpSpeed;
         private float gravity;
@@ -25,10 +26,25 @@ namespace BeardDefender_Monogame.GameObjects
         private Animation idleAnimation;
         private Animation runAnimation;
 
-        public Vector2 Positions
+        public Player(Rectangle position)
+        {
+            this.position = position;
+            this.positionNew = position;
+        }
+        public Rectangle PositionNew
+        {
+            get { return positionNew; } 
+            set { positionNew = value; }
+        }
+        public Rectangle Position
         {
             get { return position; }
-            set { position = value; }
+            set { 
+                    position.X = value.X;
+                    position.Y = value.Y;
+                    position.Width = value.Width;
+                    position.Height = value.Height;
+                }
         }
         public Texture2D Texture
         {
@@ -53,56 +69,85 @@ namespace BeardDefender_Monogame.GameObjects
             set { runAnimation = value; }
         }
 
-        public Player(Vector2 position)
+        private void CheckForCollisionsRight(Rectangle ground, KeyboardState key)
         {
-            this.position = position;
-
+            if (this.position.X + this.position.Width <= ground.X
+                && key.IsKeyDown(Keys.Right))
+            {
+                this.position.X += 5;
+                this.positionNew = this.position;
+            }
+            else if (this.positionNew.X + this.position.Width == ground.X
+                || this.positionNew.X + this.position.Width > ground.X)
+            {
+                this.position.X -= 3;
+            }
         }
-
-        public bool MovePlayer(KeyboardState keyboardState, Texture2D ground, Vector2 groundPosition, Vector2 groundPositionNext, Texture2D groundNext)
+        private void CheckForCollisionsLeft(Rectangle ground, KeyboardState key)
+        {
+            if (this.position.X + this.position.Width <= ground.X
+                && key.IsKeyDown(Keys.Left))
+            {
+                this.position.X -= 5;
+                this.positionNew = this.position;
+            }
+            else if (this.positionNew.X + this.position.Width == ground.X
+                || this.positionNew.X + this.position.Width > ground.X)
+            {
+                this.position.X -= 1;
+            }
+        }
+        public bool MovePlayer(KeyboardState keyboardState, 
+            Texture2D ground, 
+            Rectangle groundPosition, 
+            Rectangle groundPositionNext, 
+            Texture2D groundNext,
+            Rectangle groundPositionCon)
         {
             if (keyboardState.IsKeyDown(Keys.Left) || keyboardState.IsKeyDown(Keys.A))
             {
-                position.X -= 5f;
+                CheckForCollisionsLeft(groundPositionCon, keyboardState);
+                //position.X -= 5;
                 isFacingRight = true;
             }
-            if (keyboardState.IsKeyDown(Keys.Right) || keyboardState.IsKeyDown(Keys.D))
+            else if (keyboardState.IsKeyDown(Keys.Right) || keyboardState.IsKeyDown(Keys.D))
             {
-                position.X += 5f;
+                CheckForCollisionsRight(groundPositionCon, keyboardState);
+                //position.X += 5;
                 isFacingRight = false;
             }
-            if (keyboardState.IsKeyDown(Keys.Down) || keyboardState.IsKeyDown(Keys.S))
-            {
-                position.Y += 0f;
-            }
+            //if (keyboardState.IsKeyDown(Keys.Down) || keyboardState.IsKeyDown(Keys.S))
+            //{
+            //    position.Y += 0;
+            //}
             if (keyboardState.IsKeyDown(Keys.Space))
             {
                 jumping = true;
             }
 
-            position.Y += jumpSpeed;
+            //position.Y += jumpSpeed;
 
-            if (jumping == true && gravity < 0)
-            {
-                jumping = false;
-            }
-            if (jumping == true)
-            {
-                jumpSpeed = -12; //pushing the player upwards
-                gravity -= 1; //when this value results < 0 then the player goes downwards again
-            }
-            else
-            {
-                jumpSpeed = 12;
-            }
+            //if (jumping == true && gravity < 0)
+            //{
+            //    jumping = false;
+            //}
+            //if (jumping == true)
+            //{
+            //    jumpSpeed = -12; //pushing the player upwards
+            //    gravity -= 1; //when this value results < 0 then the player goes downwards again
+            //}
+            //else
+            //{
+            //    jumpSpeed = 12;
+            //}
 
-            //Resets the jump and the position of the player
-            if (position.Y > groundPositionNext.Y && jumping == false)
-            {
-                gravity = 12;
-                position.Y = 365;
-                jumpSpeed = 0;
-            }
+            ////Resets the jump and the position of the player
+            //if (position.Y > groundPositionNext.Y && jumping == false)
+            //{
+            //    gravity = 12;
+            //    position.Y = 365;
+            //    jumpSpeed = 0;
+            //}
 
             //Check for collision
             if (position.X == groundPositionNext.X)
@@ -140,7 +185,7 @@ namespace BeardDefender_Monogame.GameObjects
 
             _spriteBatch.Draw(
                 texture: player1.CurrentAnimation.Texture,
-                position: player1.Positions,
+                position: new Vector2(player1.Position.X, player1.Position.Y),
                 sourceRectangle: player1.CurrentAnimation.CurrentFrameSourceRectangle(),
                 color: Color.White,
                 rotation: 0f,

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using static System.Formats.Asn1.AsnWriter;
 using BeardDefender_Monogame.GameObjects;
 
+
 namespace BeardDefender_Monogame
 {
     public class Game1 : Game
@@ -15,6 +16,9 @@ namespace BeardDefender_Monogame
         private Animation runAnimation;
         private Animation currentAnimation;
         private bool isFacingRight;
+        //private CollisionComponent _collisionComponent;
+        const int MapWidth = 1320;
+        const int MapHeight = 720;
 
 
         // Olle :*
@@ -22,17 +26,21 @@ namespace BeardDefender_Monogame
         Player player1;
         int sharkFrameIndex;
 
-        Texture2D player;
+        //Texture2D player;
+        //Rectangle playerPositionPrevious;
+        //Rectangle playerPositionNew;
+        //Rectangle currentPosition;
+        float playerSpeed;
         Vector2 playerPosition;
 
         //Texture2D player;
 
         Texture2D ground;
-        Vector2 groundPosition;
+        Rectangle groundPosition;
         Texture2D groundCon;
-        Vector2 groundPositionCon;
+        Rectangle groundPositionCon;
         Texture2D groundNext;
-        Vector2 groundPositionNext;
+        Rectangle groundPositionNext;
 
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
@@ -43,24 +51,24 @@ namespace BeardDefender_Monogame
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+            //_collisionComponent = new CollisionComponent(new RectangleF(0, 0, MapWidth, MapHeight));
         }
 
         protected override void Initialize()
         {
-            // Grafik inställningar
             _graphics.IsFullScreen = false;
-            _graphics.PreferredBackBufferWidth = 1320;
-            _graphics.PreferredBackBufferHeight = 720;
+            _graphics.PreferredBackBufferHeight = MapHeight;
+            _graphics.PreferredBackBufferWidth = MapWidth;
             _graphics.ApplyChanges();
 
-            // Objekt positioner
-            groundPosition = new Vector2(0, 640);
-            groundPositionCon = new Vector2();
-            groundPositionNext = new Vector2();
-            
+            groundPosition = new Rectangle(0, _graphics.PreferredBackBufferHeight, 400, 80);
+            groundPositionCon = new Rectangle();
+            groundPositionNext = new Rectangle();
             shark = new (new Vector2(100, 100));
-            player1 = new Player(new Vector2(200, 200));
+            player1 = new Player(new Rectangle(100, 400, 25, 64));
             
+
+            //_collisionComponent.Insert();   //Titta vidare
 
             base.Initialize();
         }
@@ -98,6 +106,16 @@ namespace BeardDefender_Monogame
 
         protected override void Update(GameTime gameTime)
         {
+            groundPosition.Y = _graphics.PreferredBackBufferHeight - ground.Height;
+            groundPositionCon = new Rectangle(
+                    _graphics.PreferredBackBufferWidth / 4,
+                    _graphics.PreferredBackBufferHeight - ground.Height * 2,
+                    _graphics.PreferredBackBufferWidth - groundCon.Width,
+                    groundCon.Height
+                    );
+
+            player1.position.Y = groundPosition.Y - (player1.Texture.Height / 4);
+
             var kstate = Keyboard.GetState();
 
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
@@ -108,9 +126,11 @@ namespace BeardDefender_Monogame
             // Shark movement, returnerar rätt frame index som används i Update.
             sharkFrameIndex = shark.MoveShark(_graphics, gameTime);
 
+
+
             // Movement settings
             KeyboardState keyboardState = Keyboard.GetState();
-            isFacingRight = player1.MovePlayer(keyboardState,ground,groundPosition,groundPositionNext,groundNext);
+            isFacingRight = player1.MovePlayer(keyboardState, ground, groundPosition, groundPositionNext, groundNext, groundPositionCon);
 
             player1.CurrentAnimation.Update(gameTime);
 
@@ -119,9 +139,25 @@ namespace BeardDefender_Monogame
             base.Update(gameTime);
         }
 
+        private void CheckForCollisions(Rectangle playerPositionPrevious, Rectangle playerPositionNew, Rectangle ground)
+        {
+            if (playerPositionPrevious.X + playerPositionPrevious.Width != ground.X)
+            {
+                playerPositionPrevious.X += 5;
+                playerPositionNew = playerPositionPrevious;
+            }
+            else
+            {
+                playerPositionPrevious.X += 0 ;
+            }
+        }
+
+        //public static Collisions()
+
+
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Beige);
 
             _spriteBatch.Begin();
 
@@ -130,15 +166,32 @@ namespace BeardDefender_Monogame
             //Ground
             _spriteBatch.Draw(
                 ground,
-                groundPosition,
+                groundPosition = new Rectangle(
+                    0,
+                    _graphics.PreferredBackBufferHeight - ground.Height,
+                    _graphics.PreferredBackBufferWidth / 2,
+                    ground.Height
+                    ),
                 Color.White);
+
             _spriteBatch.Draw(
-                groundCon,
-                groundPositionCon = new Vector2(ground.Width, 400),
+                ground,
+                groundPositionCon = new Rectangle(
+                    _graphics.PreferredBackBufferWidth / 4,
+                    _graphics.PreferredBackBufferHeight - ground.Height * 2,
+                    _graphics.PreferredBackBufferWidth - groundCon.Width,
+                    groundCon.Height
+                    ),
                 Color.White);
+
             _spriteBatch.Draw(
-                groundNext,
-                groundPositionNext = new Vector2(ground.Width - 100, 365),
+                ground,
+                groundPositionNext = new Rectangle(
+                    groundPosition.Right,
+                    _graphics.PreferredBackBufferHeight - groundNext.Height,
+                    ground.Width + 20,
+                    groundNext.Height
+                    ),
                 Color.White);
 
             // SHAAAARK, beroende på värdet i SharkIsLeft så används rätt sprites.
