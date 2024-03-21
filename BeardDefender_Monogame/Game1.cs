@@ -2,6 +2,8 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using BeardDefender_Monogame.GameObjects;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace BeardDefender_Monogame
 {
@@ -15,13 +17,20 @@ namespace BeardDefender_Monogame
 
         // Unit objects
         Shark shark;
-        Player player;
         Hedgehog hedgehog;
+        //List<Enemy> enemyList;
+
+        //Player object
+        Player player;
 
         // Obstacles/Ground
-        Ground ground;
-        Ground groundCon;
-        Ground groundNext;
+        Ground groundLower;
+        Ground groundLower2;
+        List<Ground> lowerGroundList;
+        
+        Ground groundUpper;
+        Ground groundUpper2;
+        List<Ground> upperGroundList;
 
         /* 
         * !Allt nedan har lagts in i sina respektive klasser!
@@ -63,27 +72,52 @@ namespace BeardDefender_Monogame
 
             // Unit objects
             shark = new(new Vector2(100, 100));
-            player = new Player(new Rectangle(100, 400, 25, 64));
             hedgehog = new Hedgehog(new Vector2(100, 100), Content.Load<Texture2D>("Hedgehog_Right"), 0.03f);
+            //enemyList = new() 
+            //{
+            //    shark,
+            //    hedgehog 
+            //};
+            
+            player = new Player(new Rectangle(100, 400, 25, 36));
 
             // Obstacle/Ground. Kunde inte använda texturens Height/Width värden här,
             // 80 representerar Height, width är 640. Får klura ut hur man skulle kunna göra annars.
-            ground = new (new Rectangle(
+            groundLower = new (new Rectangle(
                 0,
                 _graphics.PreferredBackBufferHeight - 80,
                 _graphics.PreferredBackBufferWidth / 2,
                 80));
-            groundCon = new (new Rectangle(
-                _graphics.PreferredBackBufferWidth / 4,
-                _graphics.PreferredBackBufferHeight - 80 * 2,
-                _graphics.PreferredBackBufferWidth - 640,
-                80));
-            groundNext = new (new Rectangle(
-                ground.Position.Right,
+            groundLower2 = new (new Rectangle(
+                groundLower.Position.Right,
                 _graphics.PreferredBackBufferHeight - 80,
                 640 + 20,
                 80));
+
+            groundUpper = new(new Rectangle(
+                _graphics.PreferredBackBufferWidth / 4,
+                _graphics.PreferredBackBufferHeight - 80 * 2 + 50,
+                _graphics.PreferredBackBufferWidth - 640,
+                80));
+            groundUpper2 = new(new Rectangle(
+                _graphics.PreferredBackBufferWidth / 3,
+                _graphics.PreferredBackBufferHeight - 80 * 3 + 50,
+                _graphics.PreferredBackBufferWidth - 640,
+                80
+                ));
             //_collisionComponent.Insert();   //Titta vidare (NEJ)
+
+            upperGroundList = new()
+            {
+                groundUpper,
+                groundUpper2
+            };
+            lowerGroundList = new()
+            {
+                groundLower,
+                groundLower2
+            };
+            
             base.Initialize();
         }
 
@@ -105,14 +139,22 @@ namespace BeardDefender_Monogame
 
             // Laddar texturer och animationer för Player.
             player.LoadContent(Content);
-            
+
             // Texturer för shark
             shark.LoadContent(Content);
 
             // Ground
-            ground.LoadContent(Content);
-            groundCon.LoadContent(Content);
-            groundNext.LoadContent(Content);
+            foreach (var item in upperGroundList)
+            {
+                item.LoadContent(Content);
+            }
+            foreach (var item in lowerGroundList)
+            {
+                item.LoadContent(Content);
+            }
+            //ground.LoadContent(Content);
+            //groundCon.LoadContent(Content);
+            //groundNext.LoadContent(Content);
 
             // TODO: use this.Content to load your game content here
         }
@@ -133,7 +175,7 @@ namespace BeardDefender_Monogame
             //        );
 
             // Player pos Y för att stå på marken.
-            player.position.Y = ground.Position.Y - (player.Texture.Height / 4);
+            player.position.Y = groundLower.Position.Y - (player.Texture.Height / 4);
 
             // Shark movement, returnerar rätt frame index som används i Update.
             shark.CurrentFrameIndex = shark.Update(_graphics, gameTime);
@@ -145,9 +187,8 @@ namespace BeardDefender_Monogame
             player.IsFacingRight = 
                 player.MovePlayer(
                     keyboardState,
-                    ground,
-                    groundNext,
-                    groundCon);
+                    upperGroundList,
+                    lowerGroundList);
 
             player.CurrentAnimation.Update(gameTime);
             
@@ -167,9 +208,17 @@ namespace BeardDefender_Monogame
             hedgehog.Draw(_spriteBatch);
 
             //Ground
-            ground.Draw(_spriteBatch);
-            groundCon.Draw(_spriteBatch);
-            groundNext.Draw(_spriteBatch);
+            foreach (var item in upperGroundList)
+            {
+                item.Draw(_spriteBatch);
+            }
+            foreach (var item in lowerGroundList)
+            {
+                item.Draw(_spriteBatch);
+            }
+            //ground.Draw(_spriteBatch);
+            //groundCon.Draw(_spriteBatch);
+            //groundNext.Draw(_spriteBatch);
 
             // Draw sköts nu av ground objekten.
 
