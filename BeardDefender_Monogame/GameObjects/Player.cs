@@ -1,14 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace BeardDefender_Monogame.GameObjects
@@ -31,42 +24,13 @@ namespace BeardDefender_Monogame.GameObjects
             this.position = position;
             this.positionNew = position;
         }
-        public Rectangle PositionNew
+        
+        public void LoadContent (ContentManager Content)
         {
-            get { return positionNew; } 
-            set { positionNew = value; }
-        }
-        public Rectangle Position
-        {
-            get { return position; }
-            set { 
-                    position.X = value.X;
-                    position.Y = value.Y;
-                    position.Width = value.Width;
-                    position.Height = value.Height;
-                }
-        }
-        public Texture2D Texture
-        {
-            get { return texture; }
-            set { texture = value; }
-        }
-        public Animation CurrentAnimation
-        {
-            get { return currentAnimation; }
-            set { currentAnimation = value; }
-        }
-
-        public Animation IdleAnimation
-        {
-            get { return idleAnimation; }
-            set { idleAnimation = value; }
-        }
-
-        public Animation RunAnimation
-        {
-            get { return runAnimation; }
-            set { runAnimation = value; }
+            this.idleAnimation = new Animation(Content.Load<Texture2D>("Idle-Left"), 0.1f, true);
+            this.runAnimation = new Animation(Content.Load<Texture2D>("Run-LEFT"), 0.1f, true);
+            this.texture = Content.Load<Texture2D>("Run-Right");
+            this.currentAnimation = runAnimation;
         }
 
         private void CheckForCollisionsRight(Rectangle ground, KeyboardState key)
@@ -98,21 +62,19 @@ namespace BeardDefender_Monogame.GameObjects
             }
         }
         public bool MovePlayer(KeyboardState keyboardState, 
-            Texture2D ground, 
-            Rectangle groundPosition, 
-            Rectangle groundPositionNext, 
-            Texture2D groundNext,
-            Rectangle groundPositionCon)
+            Ground ground, 
+            Ground groundNext,
+            Ground groundCon)
         {
             if (keyboardState.IsKeyDown(Keys.Left) || keyboardState.IsKeyDown(Keys.A))
             {
-                CheckForCollisionsLeft(groundPositionCon, keyboardState);
+                CheckForCollisionsLeft(groundCon.Position, keyboardState);
                 //position.X -= 5;
                 isFacingRight = true;
             }
             else if (keyboardState.IsKeyDown(Keys.Right) || keyboardState.IsKeyDown(Keys.D))
             {
-                CheckForCollisionsRight(groundPositionCon, keyboardState);
+                CheckForCollisionsRight(groundCon.Position, keyboardState);
                 //position.X += 5;
                 isFacingRight = false;
             }
@@ -150,14 +112,14 @@ namespace BeardDefender_Monogame.GameObjects
             //}
 
             //Check for collision
-            if (position.X == groundPositionNext.X)
+            if (position.X == groundNext.Position.X)
             {
-                position.X = groundPositionNext.X;
+                position.X = groundNext.Position.X;
             }
 
-            if (position.Y - texture.Height < ground.Height)
+            if (position.Y - texture.Height < ground.Texture.Height)
             {
-                position.Y = ground.Bounds.Top - texture.Height;
+                position.Y = ground.Texture.Bounds.Top - texture.Height;
             }
             if (keyboardState.IsKeyDown(Keys.W) ||
                 keyboardState.IsKeyDown(Keys.Up) ||
@@ -177,23 +139,73 @@ namespace BeardDefender_Monogame.GameObjects
             return isFacingRight;
         }
 
-        public void DrawPlayer(SpriteBatch _spriteBatch, Player player1 )
+        public void DrawPlayer(SpriteBatch _spriteBatch)
         {
             SpriteEffects spriteEffects = isFacingRight ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
 
             //Vector2 scale = new Vector2(20f, 20f);
 
             _spriteBatch.Draw(
-                texture: player1.CurrentAnimation.Texture,
-                position: new Vector2(player1.Position.X, player1.Position.Y),
-                sourceRectangle: player1.CurrentAnimation.CurrentFrameSourceRectangle(),
+                texture: this.CurrentAnimation.Texture,
+                position: new Vector2(
+                    this.Position.X,
+                    this.Position.Y),
+                sourceRectangle: this.CurrentAnimation.CurrentFrameSourceRectangle(),
                 color: Color.White,
                 rotation: 0f,
-                origin: new Vector2(player1.CurrentAnimation.FrameWidth / 2, player1.CurrentAnimation.FrameHeight / 2),
+                origin: new Vector2(
+                    this.CurrentAnimation.FrameWidth / 2,
+                    this.CurrentAnimation.FrameHeight / 2),
                 scale: Vector2.One,
                 effects: spriteEffects,
                 layerDepth: 0f
             );
+        }
+
+
+        // Get/Set
+        public bool IsFacingRight
+        {
+            get { return isFacingRight; }
+            set { isFacingRight = value; }
+        }
+        public Rectangle PositionNew
+        {
+            get { return positionNew; }
+            set { positionNew = value; }
+        }
+        public Rectangle Position
+        {
+            get { return position; }
+            set
+            {
+                position.X = value.X;
+                position.Y = value.Y;
+                position.Width = value.Width;
+                position.Height = value.Height;
+            }
+        }
+        public Texture2D Texture
+        {
+            get { return texture; }
+            set { texture = value; }
+        }
+        public Animation CurrentAnimation
+        {
+            get { return currentAnimation; }
+            set { currentAnimation = value; }
+        }
+
+        public Animation IdleAnimation
+        {
+            get { return idleAnimation; }
+            set { idleAnimation = value; }
+        }
+
+        public Animation RunAnimation
+        {
+            get { return runAnimation; }
+            set { runAnimation = value; }
         }
 
     }
