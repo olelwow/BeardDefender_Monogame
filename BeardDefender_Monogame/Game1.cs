@@ -1,166 +1,158 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System.Reflection.Emit;
-using System;
-using System.Collections.Generic;
-using static System.Formats.Asn1.AsnWriter;
 using BeardDefender_Monogame.GameObjects;
-
 
 namespace BeardDefender_Monogame
 {
     public class Game1 : Game
     {
-        private Animation idleAnimation;
-        private Animation runAnimation;
-        private Animation currentAnimation;
-        private bool isFacingRight;
-        //private CollisionComponent _collisionComponent;
+        // Important shit
+        private GraphicsDeviceManager _graphics;
+        private SpriteBatch _spriteBatch;
         const int MapWidth = 1320;
         const int MapHeight = 720;
 
+        // Unit objects
+        Shark shark;
+        Player player;
         Hedgehog hedgehog;
 
-        // Olle :*
-        Shark shark;
-        Player player1;
-        int sharkFrameIndex;
+        // Obstacles/Ground
+        Ground ground;
+        Ground groundCon;
+        Ground groundNext;
 
+        /* 
+        * !Allt nedan har lagts in i sina respektive klasser!
+        */
+        //Texture2D ground;
+        //Rectangle groundPosition;
+        //Texture2D groundCon;
+        //Rectangle groundPositionCon;
+        //Texture2D groundNext;
+        //Rectangle groundPositionNext;
+        //int sharkFrameIndex;
+        //private Animation idleAnimation;
+        //private Animation runAnimation;
+        //private Animation currentAnimation;
+        //private bool isFacingRight;
+        //private CollisionComponent _collisionComponent;
         //Texture2D player;
         //Rectangle playerPositionPrevious;
         //Rectangle playerPositionNew;
         //Rectangle currentPosition;
-        float playerSpeed;
-        Vector2 playerPosition;
-
+        //float playerSpeed;
+        //Vector2 playerPosition;
         //Texture2D player;
-
-        Texture2D ground;
-        Rectangle groundPosition;
-        Texture2D groundCon;
-        Rectangle groundPositionCon;
-        Texture2D groundNext;
-        Rectangle groundPositionNext;
-
-        private GraphicsDeviceManager _graphics;
-        private SpriteBatch _spriteBatch;
-        
 
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
-            Content.RootDirectory = "Content";
+            this.Content.RootDirectory = "Content";
             IsMouseVisible = true;
-            //_collisionComponent = new CollisionComponent(new RectangleF(0, 0, MapWidth, MapHeight));
         }
 
         protected override void Initialize()
         {
+            // Grafikinställningar.
             _graphics.IsFullScreen = false;
             _graphics.PreferredBackBufferHeight = MapHeight;
             _graphics.PreferredBackBufferWidth = MapWidth;
             _graphics.ApplyChanges();
 
-            groundPosition = new Rectangle(0, _graphics.PreferredBackBufferHeight, 400, 80);
-            groundPositionCon = new Rectangle();
-            groundPositionNext = new Rectangle();
-            shark = new (new Vector2(100, 100));
-            player1 = new Player(new Rectangle(100, 400, 25, 64));
-
+            // Unit objects
+            shark = new(new Vector2(100, 100));
+            player = new Player(new Rectangle(100, 400, 25, 64));
             hedgehog = new Hedgehog(new Vector2(100, 100), Content.Load<Texture2D>("Hedgehog_Right"), 0.03f);
 
-
-            //_collisionComponent.Insert();   //Titta vidare
-
+            // Obstacle/Ground. Kunde inte använda texturens Height/Width värden här,
+            // 80 representerar Height, width är 640. Får klura ut hur man skulle kunna göra annars.
+            ground = new (new Rectangle(
+                0,
+                _graphics.PreferredBackBufferHeight - 80,
+                _graphics.PreferredBackBufferWidth / 2,
+                80));
+            groundCon = new (new Rectangle(
+                _graphics.PreferredBackBufferWidth / 4,
+                _graphics.PreferredBackBufferHeight - 80 * 2,
+                _graphics.PreferredBackBufferWidth - 640,
+                80));
+            groundNext = new (new Rectangle(
+                ground.Position.Right,
+                _graphics.PreferredBackBufferHeight - 80,
+                640 + 20,
+                80));
+            //_collisionComponent.Insert();   //Titta vidare (NEJ)
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
-            this.Content.RootDirectory = "Content";
-
-            idleAnimation = new Animation(Content.Load<Texture2D>("Idle-Left"), 0.1f, true);
-            runAnimation = new Animation(Content.Load<Texture2D>("Run-LEFT"), 0.1f, true);
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-
-
             //Texturer för player1
-            player1.CurrentAnimation = idleAnimation;
-            player1.RunAnimation = runAnimation;
-            player1.IdleAnimation = idleAnimation;
-            // Texturer för shark
-            shark.TextureLeft[0] = Content.Load<Texture2D>("wackShark1_left");
-            shark.TextureLeft[1] = Content.Load<Texture2D>("wackShark2_left");
-            shark.TextureRight[0] = Content.Load<Texture2D>("wackShark1_right");
-            shark.TextureRight[1] = Content.Load<Texture2D>("wackShark2_right");
-            shark.Texture = shark.TextureLeft[0];
+            //player1.CurrentAnimation = idleAnimation;
+            //player1.RunAnimation = runAnimation;
+            //player1.IdleAnimation = idleAnimation;
+            //player1.Texture = Content.Load<Texture2D>("Run-Right");
+            //currentAnimation = idleAnimation;
+            //idleAnimation = new Animation(Content.Load<Texture2D>("Idle-Left"), 0.1f, true);
+            //runAnimation = new Animation(Content.Load<Texture2D>("Run-LEFT"), 0.1f, true);
 
-            player1.Texture = Content.Load<Texture2D>("Run-Right");
+            /* 
+             * !Allt ovan har lagts in i sina respektive klasser!
+             */
+
+            // Laddar texturer och animationer för Player.
+            player.LoadContent(Content);
             
-            ground = Content.Load<Texture2D>("ground 10tiles");
-            groundCon = Content.Load<Texture2D>("ground 10tiles");
-            groundNext = Content.Load<Texture2D>("ground 10tiles");
+            // Texturer för shark
+            shark.LoadContent(Content);
 
-            currentAnimation = idleAnimation;
+            // Ground
+            ground.LoadContent(Content);
+            groundCon.LoadContent(Content);
+            groundNext.LoadContent(Content);
 
             // TODO: use this.Content to load your game content here
         }
 
         protected override void Update(GameTime gameTime)
         {
-            groundPosition.Y = _graphics.PreferredBackBufferHeight - ground.Height;
-            groundPositionCon = new Rectangle(
-                    _graphics.PreferredBackBufferWidth / 4,
-                    _graphics.PreferredBackBufferHeight - ground.Height * 2,
-                    _graphics.PreferredBackBufferWidth - groundCon.Width,
-                    groundCon.Height
-                    );
-
-            player1.position.Y = groundPosition.Y - (player1.Texture.Height / 4);
-
-            var kstate = Keyboard.GetState();
-
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+            KeyboardState keyboardState = Keyboard.GetState();
+            if (keyboardState.IsKeyDown(Keys.Escape))
             {
                 Exit();
             }
+            //ground.Position.Y = _graphics.PreferredBackBufferHeight - ground.Position.Height;
+            //groundCon.Position = new Rectangle(
+            //        _graphics.PreferredBackBufferWidth / 4,
+            //        _graphics.PreferredBackBufferHeight - ground.Position.Height * 2,
+            //        _graphics.PreferredBackBufferWidth - groundCon.Position.Width,
+            //        groundCon.Position.Height
+            //        );
+
+            // Player pos Y för att stå på marken.
+            player.position.Y = ground.Position.Y - (player.Texture.Height / 4);
 
             // Shark movement, returnerar rätt frame index som används i Update.
-            sharkFrameIndex = shark.MoveShark(_graphics, gameTime);
+            shark.CurrentFrameIndex = shark.Update(_graphics, gameTime);
+            // Hedgehog movement.
+            hedgehog.Update(gameTime, new Vector2(player.position.X, player.position.Y));
 
+            // Player movement, sätter players variabel IsFacingRight till returvärdet av
+            // metoden, som håller koll på vilket håll spelaren är riktad åt.
+            player.IsFacingRight = 
+                player.MovePlayer(
+                    keyboardState,
+                    ground,
+                    groundNext,
+                    groundCon);
 
-
-            // Movement settings
-            KeyboardState keyboardState = Keyboard.GetState();
-            isFacingRight = player1.MovePlayer(keyboardState, ground, groundPosition, groundPositionNext, groundNext, groundPositionCon);
-
-            player1.CurrentAnimation.Update(gameTime);
-
-            //player1.DrawPlayer(_spriteBatch, player1);
-
-            hedgehog.Update(gameTime, new Vector2(player1.position.X, player1.position.Y));
-
-            // TODO: Add your update logic here
-
+            player.CurrentAnimation.Update(gameTime);
+            
             base.Update(gameTime);
         }
-
-        private void CheckForCollisions(Rectangle playerPositionPrevious, Rectangle playerPositionNew, Rectangle ground)
-        {
-            if (playerPositionPrevious.X + playerPositionPrevious.Width != ground.X)
-            {
-                playerPositionPrevious.X += 5;
-                playerPositionNew = playerPositionPrevious;
-            }
-            else
-            {
-                playerPositionPrevious.X += 0 ;
-            }
-        }
-
-        //public static Collisions()
-
 
         protected override void Draw(GameTime gameTime)
         {
@@ -168,47 +160,52 @@ namespace BeardDefender_Monogame
 
             _spriteBatch.Begin();
 
-            player1.DrawPlayer(_spriteBatch,player1);
+            player.DrawPlayer(_spriteBatch);
 
-            //Ground
-            _spriteBatch.Draw(
-                ground,
-                groundPosition = new Rectangle(
-                    0,
-                    _graphics.PreferredBackBufferHeight - ground.Height,
-                    _graphics.PreferredBackBufferWidth / 2,
-                    ground.Height
-                    ),
-                Color.White);
-
-            _spriteBatch.Draw(
-                ground,
-                groundPositionCon = new Rectangle(
-                    _graphics.PreferredBackBufferWidth / 4,
-                    _graphics.PreferredBackBufferHeight - ground.Height * 2,
-                    _graphics.PreferredBackBufferWidth - groundCon.Width,
-                    groundCon.Height
-                    ),
-                Color.White);
-
-            _spriteBatch.Draw(
-                ground,
-                groundPositionNext = new Rectangle(
-                    groundPosition.Right,
-                    _graphics.PreferredBackBufferHeight - groundNext.Height,
-                    ground.Width + 20,
-                    groundNext.Height
-                    ),
-                Color.White);
-
-            // SHAAAARK, beroende på värdet i SharkIsLeft så används rätt sprites.
-            // Skapa gärna metoder för utritningen av objekt. 
-            shark.DrawShark(_spriteBatch, shark, sharkFrameIndex);
-
+            // SHAAAARKs draw metod sköter animationer beroende på åt vilket håll hajen rör sig.
+            shark.Draw(_spriteBatch);
             hedgehog.Draw(_spriteBatch);
 
-            _spriteBatch.End();
+            //Ground
+            ground.Draw(_spriteBatch);
+            groundCon.Draw(_spriteBatch);
+            groundNext.Draw(_spriteBatch);
 
+            // Draw sköts nu av ground objekten.
+
+            //_spriteBatch.Draw(
+            //    ground,
+            //    groundPosition = new Rectangle(
+            //        0,
+            //        _graphics.PreferredBackBufferHeight - ground.Height,
+            //        _graphics.PreferredBackBufferWidth / 2,
+            //        ground.Height
+            //        ),
+            //    Color.White);
+
+            //_spriteBatch.Draw(
+            //    ground,
+            //    groundPositionCon = new Rectangle(
+            //        _graphics.PreferredBackBufferWidth / 4,
+            //        _graphics.PreferredBackBufferHeight - ground.Height * 2,
+            //        _graphics.PreferredBackBufferWidth - groundCon.Width,
+            //        groundCon.Height
+            //        ),
+            //    Color.White);
+
+            //_spriteBatch.Draw(
+            //    ground,
+            //    groundPositionNext = new Rectangle(
+            //        groundPosition.Right,
+            //        _graphics.PreferredBackBufferHeight - groundNext.Height,
+            //        ground.Width + 20,
+            //        groundNext.Height
+            //        ),
+            //    Color.White);
+
+            // Draw sköts nu av ground objekten.
+
+            _spriteBatch.End();
             base.Draw(gameTime);
         }
     }

@@ -1,9 +1,10 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 
 namespace BeardDefender_Monogame.GameObjects
 {
-    internal class Shark
+    internal class Shark : Enemy
     {
         private float speed = 150f;
         private Vector2 position;
@@ -24,11 +25,19 @@ namespace BeardDefender_Monogame.GameObjects
             textureRight = new Texture2D[2];
         }
 
+        // Laddar in bilder till Shark objektet.
+        public void LoadContent (ContentManager Content)
+        {
+            this.textureLeft[0] = Content.Load<Texture2D>("wackShark1_left");
+            this.TextureLeft[1] = Content.Load<Texture2D>("wackShark2_left");
+            this.TextureRight[0] = Content.Load<Texture2D>("wackShark1_right");
+            this.TextureRight[1] = Content.Load<Texture2D>("wackShark2_right");
+            this.Texture = this.TextureLeft[0];
+        }
         // Denna metod räknar ut vilken frame man är på, och sköter hajens movement mellan vissa punkter.
         // Returnerar en int som representerar frame index.
-        public int MoveShark(GraphicsDeviceManager _graphics, GameTime gameTime)
+        public override int Update(GraphicsDeviceManager _graphics, GameTime gameTime)
         {
-
             // Uppdatera frameTimer
             frameTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (frameTimer >= frameDuration)
@@ -67,44 +76,46 @@ namespace BeardDefender_Monogame.GameObjects
             }
             return currentFrameIndex;
         }
-
-        public void DrawShark(SpriteBatch _spriteBatch, Shark shark, int sharkFrameIndex)
+        public override void Draw(SpriteBatch spriteBatch)
         {
-            if (!shark.SharkIsLeft)
+            if (!this.SharkIsLeft)
             {
-                _spriteBatch.Draw(
-                    shark.TextureLeft[sharkFrameIndex],
-                    shark.Position,
+                spriteBatch.Draw(
+                    this.TextureLeft[CurrentFrameIndex],
+                    this.Position,
                     null,
                     Color.White,
                     0f,
                     new Vector2(
-                        shark.Texture.Width / 2,
-                        shark.Texture.Height / 2),
+                        this.Texture.Width / 2,
+                        this.Texture.Height / 2),
                     Vector2.One,
                     SpriteEffects.None,
-                    0f
-                    );
+                    0f);
             }
             else
             {
-                _spriteBatch.Draw(
-                shark.TextureRight[sharkFrameIndex],
-                shark.Position,
-                null,
-                Color.White,
-                0f,
-                new Vector2(
-                    shark.Texture.Width / 2,
-                    shark.Texture.Height / 2),
-                Vector2.One,
-                SpriteEffects.None,
-                0f
-                );
+                spriteBatch.Draw(
+                    this.TextureRight[CurrentFrameIndex],
+                    this.Position,
+                    null,
+                    Color.White,
+                    0f,
+                    new Vector2(
+                        this.Texture.Width / 2,
+                        this.Texture.Height / 2),
+                    Vector2.One,
+                    SpriteEffects.None,
+                    0f);
             }
         }
-
-        // Getters och Setters
+        
+        // Get/Set
+        public int CurrentFrameIndex
+        {
+            get { return currentFrameIndex; }
+            set { currentFrameIndex = value; }
+        }
         public bool SharkIsLeft
         {
             get { return sharkIsLeft; }
