@@ -20,6 +20,7 @@ namespace BeardDefender_Monogame
         const int MapWidth = 1320;
         const int MapHeight = 720;
 
+        Hedgehog hedgehog;
 
         // Olle :*
         Shark shark;
@@ -66,7 +67,9 @@ namespace BeardDefender_Monogame
             groundPositionNext = new Rectangle();
             shark = new (new Vector2(100, 100));
             player1 = new Player(new Rectangle(100, 400, 25, 64));
-            
+
+            hedgehog = new Hedgehog(new Vector2(100, 100), Content.Load<Texture2D>("Hedgehog_Right"), 0.03f);
+
 
             //_collisionComponent.Insert();   //Titta vidare
 
@@ -134,6 +137,10 @@ namespace BeardDefender_Monogame
 
             player1.CurrentAnimation.Update(gameTime);
 
+            //player1.DrawPlayer(_spriteBatch, player1);
+
+            hedgehog.Update(gameTime, new Vector2(player1.position.X, player1.position.Y));
+
             // TODO: Add your update logic here
 
             base.Update(gameTime);
@@ -197,7 +204,9 @@ namespace BeardDefender_Monogame
             // SHAAAARK, beroende på värdet i SharkIsLeft så används rätt sprites.
             // Skapa gärna metoder för utritningen av objekt. 
             shark.DrawShark(_spriteBatch, shark, sharkFrameIndex);
-            
+
+            hedgehog.Draw(_spriteBatch);
+
             _spriteBatch.End();
 
             base.Draw(gameTime);
