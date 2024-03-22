@@ -15,6 +15,9 @@ namespace BeardDefender_Monogame
         const int MapWidth = 1320;
         const int MapHeight = 720;
 
+        //Background object
+        Background background;
+
         // Unit objects
         Shark shark;
         Hedgehog hedgehog;
@@ -71,6 +74,7 @@ namespace BeardDefender_Monogame
             _graphics.ApplyChanges();
 
             // Unit objects
+            background = new Background();
             shark = new(new Vector2(100, 100));
             hedgehog = new Hedgehog(new Vector2(100, 100), Content.Load<Texture2D>("Hedgehog_Right"), 0.03f);
             //enemyList = new() 
@@ -137,6 +141,9 @@ namespace BeardDefender_Monogame
              * !Allt ovan har lagts in i sina respektive klasser!
              */
 
+            //Laddar texturer för Background.
+            background.LoadContent(Content);
+
             // Laddar texturer och animationer för Player.
             player.LoadContent(Content);
 
@@ -201,6 +208,7 @@ namespace BeardDefender_Monogame
 
             _spriteBatch.Begin();
 
+            background.DrawBackground(_spriteBatch, MapWidth, MapHeight);
             player.DrawPlayer(_spriteBatch);
 
             // SHAAAARKs draw metod sköter animationer beroende på åt vilket håll hajen rör sig.
