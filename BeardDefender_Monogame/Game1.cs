@@ -10,7 +10,8 @@ namespace BeardDefender_Monogame
     enum Scenes
     {
         MAIN_MENU,
-        GAME
+        GAME,
+        HIGHSCORE
     };
     public class Game1 : Game
     {
@@ -35,6 +36,9 @@ namespace BeardDefender_Monogame
         // MainMenu object
         MainMenu mainmenu;
         SpriteFont buttonFont;
+
+        //Highscore object
+        Highscore highscore;
 
         //Background object
         Background background;
@@ -74,6 +78,7 @@ namespace BeardDefender_Monogame
 
             // Unit objects
             mainmenu = new MainMenu();
+            highscore = new Highscore();
             background = new Background();
             shark = new(new Vector2(100, 100));
             hedgehog = new Hedgehog(new Vector2(100, 100), Content.Load<Texture2D>("Hedgehog_Right"), 0.03f);
@@ -135,10 +140,11 @@ namespace BeardDefender_Monogame
             //Laddar texturer för MainMenu.
             mainmenu.LoadContent(Content);
 
-
-
             //Laddar texturer för Background.
             background.LoadContent(Content);
+
+            highscore.LoadContent(Content);
+
 
             // Laddar texturer och animationer för Player.
             player.LoadContent(Content);
@@ -249,10 +255,13 @@ namespace BeardDefender_Monogame
                     mainmenu.DrawMainMenu(_spriteBatch, MapWidth, MapHeight);
 
                     // Ritar "Starta spelet"-val
-                    _spriteBatch.DrawString(buttonFont, "PLAY", new Vector2(635, 390), startGameSelected ? Color.Red : Color.Black);
+                    _spriteBatch.DrawString(buttonFont, "PLAY", new Vector2(616, 370), startGameSelected ? Color.Red : Color.Black);
+
+                    //Ritar "Highscore"-val
+                    _spriteBatch.DrawString(buttonFont, "SCORE", new Vector2(590, 470), startGameSelected ? Color.Red : Color.Black);
 
                     // Ritar "Avsluta spelet"-val
-                    _spriteBatch.DrawString(buttonFont, "EXIT GAME", new Vector2(600, 595), exitGameSelected ? Color.Red : Color.Black);
+                    _spriteBatch.DrawString(buttonFont, "EXIT", new Vector2(618, 575), exitGameSelected ? Color.Red : Color.Black);
 
 
                     break;
