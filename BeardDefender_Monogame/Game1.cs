@@ -23,8 +23,13 @@ namespace BeardDefender_Monogame
         const int MapWidth = 1320;
         const int MapHeight = 720;
 
+        bool startGameSelected = true; // Starta spelet är förvalt
+        bool exitGameSelected = false;
+
+
         // MainMenu object
         MainMenu mainmenu;
+        SpriteFont buttonFont;
 
         //Background object
         Background background;
@@ -114,10 +119,18 @@ namespace BeardDefender_Monogame
         {
             //texture = Content.Load<Texture2D>("BeardDefender_MainMenu");
 
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
+           
+       
+         _spriteBatch = new SpriteBatch(GraphicsDevice);
+          buttonFont = Content.Load<SpriteFont>("Font"); 
+       
+
+        _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             //Laddar texturer för MainMenu.
             mainmenu.LoadContent(Content);
+
+            
 
             //Laddar texturer för Background.
             background.LoadContent(Content);
@@ -143,27 +156,51 @@ namespace BeardDefender_Monogame
         {
             switch (activeScenes)
             {
+
+
+
                 case Scenes.MAIN_MENU:
 
-                    if (Keyboard.GetState().IsKeyDown(Keys.Space))
+                    //if (Keyboard.GetState().IsKeyDown(Keys.Space))
+                    //{
+                    //    activeScenes = Scenes.GAME;
+                    //}
+                    //if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+                    //{
+                    //    Exit();
+                    //}
+
+                    KeyboardState state = Keyboard.GetState();
+                    if (state.IsKeyDown(Keys.Up) || state.IsKeyDown(Keys.Down))
+                    {
+                        startGameSelected = !startGameSelected;
+                        exitGameSelected = !exitGameSelected;
+                    }
+
+                    if (startGameSelected == true && state.IsKeyDown(Keys.Enter))
                     {
                         activeScenes = Scenes.GAME;
+
                     }
-                    if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+
+                    if (exitGameSelected == true && state.IsKeyDown(Keys.Enter))
                     {
                         Exit();
+
                     }
+
+
                     break;
 
                 case Scenes.GAME:
-                    //if (Keyboard.GetState().IsKeyDown(Keys.Escape))
-                    //{
-                    //    activeScenes = Scenes.MAIN_MENU;
-                    //}
                     if (Keyboard.GetState().IsKeyDown(Keys.Escape))
                     {
-                        Exit();
+                        activeScenes = Scenes.MAIN_MENU;
                     }
+                    //if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+                    //{
+                    //    Exit();
+                    //}
                     break;
 
             }
@@ -201,12 +238,22 @@ namespace BeardDefender_Monogame
 
             _spriteBatch.Begin();
 
+           
+
+
             switch (activeScenes)
             {
                 case Scenes.MAIN_MENU:
 
                     //_spriteBatch.Draw(texture, new Rectangle(0, 0, MapWidth, MapHeight), Color.White);
                     mainmenu.DrawMainMenu(_spriteBatch, MapWidth, MapHeight);
+
+                    // Ritar "Starta spelet"-val
+                    _spriteBatch.DrawString(buttonFont, "Starta spelet", new Vector2(100, 100), startGameSelected ? Color.Yellow : Color.White);
+
+                    // Ritar "Avsluta spelet"-val
+                    _spriteBatch.DrawString(buttonFont, "Avsluta spelet", new Vector2(100, 140), exitGameSelected ? Color.Yellow : Color.White);
+
 
                     break;
 
