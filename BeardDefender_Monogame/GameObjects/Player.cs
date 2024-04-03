@@ -24,6 +24,7 @@ namespace BeardDefender_Monogame.GameObjects
         private Animation currentAnimation;
         private Animation idleAnimation;
         private Animation runAnimation;
+        private Hedgehog hedgehog;
 
         public Player(RectangleF position)
         {
@@ -41,10 +42,12 @@ namespace BeardDefender_Monogame.GameObjects
 
         public bool MovePlayer(
             KeyboardState keyboardState, 
+            Hedgehog hedgehog,
             List<Ground> groundList
             )
         {
-            GameMechanics.ApplyGravity(groundList, this);
+            GameMechanics.ApplyGravity(groundList, this, hedgehog);
+            GameMechanics.EnemyCollision(hedgehog, this);
 
             if (keyboardState.IsKeyDown(Keys.Left) || keyboardState.IsKeyDown(Keys.A))
             {
