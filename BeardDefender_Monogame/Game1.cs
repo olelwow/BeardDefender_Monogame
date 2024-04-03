@@ -12,7 +12,8 @@ namespace BeardDefender_Monogame
     enum Scenes
     {
         MAIN_MENU,
-        GAME
+        GAME,
+        HIGHSCORE
     };
     public class Game1 : Game
     {
@@ -27,11 +28,20 @@ namespace BeardDefender_Monogame
 
         bool startGameSelected = true; // Starta spelet är förvalt
         bool exitGameSelected = false;
+        bool highscoreSelected = false;
+
+        private bool previousUpPressed = false;
+        private bool previousDownPressed = false;
+        private bool previousEnterPressed = false;
+
 
 
         // MainMenu object
         MainMenu mainmenu;
         SpriteFont buttonFont;
+
+        //Highscore object
+        Highscore highscore;
 
         //Background object
         Background background;
@@ -72,6 +82,7 @@ namespace BeardDefender_Monogame
 
             // Unit objects
             mainmenu = new MainMenu();
+            highscore = new Highscore();
             background = new Background();
             shark = new(new Vector2(100, 100));
             hedgehog = new Hedgehog(new Vector2(100, 100), Content.Load<Texture2D>("Hedgehog_Right"), 0.03f);
@@ -128,21 +139,22 @@ namespace BeardDefender_Monogame
         {
             //texture = Content.Load<Texture2D>("BeardDefender_MainMenu");
 
-           
-       
-         _spriteBatch = new SpriteBatch(GraphicsDevice);
-          buttonFont = Content.Load<SpriteFont>("Font"); 
-       
 
-        _spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
+            buttonFont = Content.Load<SpriteFont>("Font");
+
+
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             //Laddar texturer för MainMenu.
             mainmenu.LoadContent(Content);
 
-            
-
             //Laddar texturer för Background.
             background.LoadContent(Content);
+
+            //laddar texturer för Highscore
+            highscore.LoadContent(Content);
 
             // Laddar texturer och animationer för Player.
             player.LoadContent(Content);
@@ -170,33 +182,36 @@ namespace BeardDefender_Monogame
 
                 case Scenes.MAIN_MENU:
 
-                    //if (Keyboard.GetState().IsKeyDown(Keys.Space))
-                    //{
-                    //    activeScenes = Scenes.GAME;
-                    //}
-                    //if (Keyboard.GetState().IsKeyDown(Keys.Escape))
-                    //{
-                    //    Exit();
-                    //}
-
                     KeyboardState state = Keyboard.GetState();
-                    if (state.IsKeyDown(Keys.Up) || state.IsKeyDown(Keys.Down))
+
+
+                    bool upDownPressed = state.IsKeyDown(Keys.Up) || state.IsKeyDown(Keys.Down);
+                    if (upDownPressed && !previousUpPressed && !previousDownPressed)
                     {
                         startGameSelected = !startGameSelected;
+                        highscoreSelected = !highscoreSelected;
                         exitGameSelected = !exitGameSelected;
                     }
 
-                    if (startGameSelected == true && state.IsKeyDown(Keys.Enter))
+                    if (state.IsKeyDown(Keys.Enter) && !previousEnterPressed)
                     {
-                        activeScenes = Scenes.GAME;
-
+                        if (startGameSelected)
+                        {
+                            activeScenes = Scenes.GAME;
+                        }
+                        else if(state.IsKeyDown(Keys.Enter) && !previousEnterPressed )
+                        {
+                            activeScenes = Scenes.HIGHSCORE;
+                        }
+                        else if (exitGameSelected)
+                        {
+                            Exit();
+                        }
                     }
 
-                    if (exitGameSelected == true && state.IsKeyDown(Keys.Enter))
-                    {
-                        Exit();
-
-                    }
+                    previousUpPressed = state.IsKeyDown(Keys.Up);
+                    previousDownPressed = state.IsKeyDown(Keys.Down);
+                    previousEnterPressed = state.IsKeyDown(Keys.Enter);
 
 
                     break;
@@ -206,10 +221,14 @@ namespace BeardDefender_Monogame
                     {
                         activeScenes = Scenes.MAIN_MENU;
                     }
-                    //if (Keyboard.GetState().IsKeyDown(Keys.Escape))
-                    //{
-                    //    Exit();
-                    //}
+
+                    break;
+
+                    case Scenes.HIGHSCORE:
+                    if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+                    {
+                        activeScenes = Scenes.MAIN_MENU;
+                    }
                     break;
 
             }
@@ -246,12 +265,7 @@ namespace BeardDefender_Monogame
 
             _spriteBatch.Begin();
 
-            
-            background.DrawBackground(_spriteBatch, MapWidth, MapHeight);
 
- 
-
-           
 
 
             switch (activeScenes)
@@ -263,10 +277,13 @@ namespace BeardDefender_Monogame
                     mainmenu.DrawMainMenu(_spriteBatch, MapWidth, MapHeight);
 
                     // Ritar "Starta spelet"-val
-                    _spriteBatch.DrawString(buttonFont, "Starta spelet", new Vector2(100, 100), startGameSelected ? Color.Yellow : Color.White);
+                    _spriteBatch.DrawString(buttonFont, "PLAY", new Vector2(616, 370), startGameSelected ? Color.Red : Color.Black);
+
+                    //Ritar "Highscore"-val
+                    _spriteBatch.DrawString(buttonFont, "SCORE", new Vector2(590, 470), startGameSelected ? Color.Red : Color.Black);
 
                     // Ritar "Avsluta spelet"-val
-                    _spriteBatch.DrawString(buttonFont, "Avsluta spelet", new Vector2(100, 140), exitGameSelected ? Color.Yellow : Color.White);
+                    _spriteBatch.DrawString(buttonFont, "EXIT", new Vector2(618, 575), exitGameSelected ? Color.Red : Color.Black);
 
 
                     break;
@@ -287,6 +304,10 @@ namespace BeardDefender_Monogame
                         item.Draw(_spriteBatch);
                     }
                     
+                    break;
+
+                case Scenes.HIGHSCORE:
+                    highscore.DrawBackground(_spriteBatch, MapWidth, MapHeight);
                     break;
             }
 
