@@ -11,9 +11,6 @@ namespace BeardDefender_Monogame
         private Texture2D highscorebackground;
        
 
-
-
-
         public void LoadContent(ContentManager Content)
         {
             //Hämtar in respektive bild i variabler.
@@ -38,17 +35,13 @@ namespace BeardDefender_Monogame
 
         }
 
-
-
         // Get/Set
-
         public Texture2D Highscorebackground
         {
             get { return highscorebackground; }
             set { highscorebackground = value; }
         }
-
+               
         
-        }
     }
 }

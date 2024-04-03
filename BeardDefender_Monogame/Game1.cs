@@ -26,6 +26,7 @@ namespace BeardDefender_Monogame
 
         bool startGameSelected = true; // Starta spelet är förvalt
         bool exitGameSelected = false;
+        bool highscoreSelected = false;
 
         private bool previousUpPressed = false;
         private bool previousDownPressed = false;
@@ -143,8 +144,8 @@ namespace BeardDefender_Monogame
             //Laddar texturer för Background.
             background.LoadContent(Content);
 
+            //laddar texturer för Highscore
             highscore.LoadContent(Content);
-
 
             // Laddar texturer och animationer för Player.
             player.LoadContent(Content);
@@ -179,6 +180,7 @@ namespace BeardDefender_Monogame
                     if (upDownPressed && !previousUpPressed && !previousDownPressed)
                     {
                         startGameSelected = !startGameSelected;
+                        highscoreSelected = !highscoreSelected;
                         exitGameSelected = !exitGameSelected;
                     }
 
@@ -187,6 +189,10 @@ namespace BeardDefender_Monogame
                         if (startGameSelected)
                         {
                             activeScenes = Scenes.GAME;
+                        }
+                        else if(state.IsKeyDown(Keys.Enter) && !previousEnterPressed )
+                        {
+                            activeScenes = Scenes.HIGHSCORE;
                         }
                         else if (exitGameSelected)
                         {
@@ -207,6 +213,13 @@ namespace BeardDefender_Monogame
                         activeScenes = Scenes.MAIN_MENU;
                     }
 
+                    break;
+
+                    case Scenes.HIGHSCORE:
+                    if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+                    {
+                        activeScenes = Scenes.MAIN_MENU;
+                    }
                     break;
 
             }
@@ -285,6 +298,10 @@ namespace BeardDefender_Monogame
                     {
                         item.Draw(_spriteBatch);
                     }
+                    break;
+
+                case Scenes.HIGHSCORE:
+                    highscore.DrawBackground(_spriteBatch, MapWidth, MapHeight);
                     break;
             }
 
