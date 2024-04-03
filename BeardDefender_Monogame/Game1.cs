@@ -4,6 +4,8 @@ using Microsoft.Xna.Framework.Input;
 using BeardDefender_Monogame.GameObjects;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Drawing;
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace BeardDefender_Monogame
 {
@@ -54,11 +56,12 @@ namespace BeardDefender_Monogame
         // Obstacles/Ground
         Ground groundLower;
         Ground groundLower2;
-        List<Ground> lowerGroundList;
 
+        List<Ground> groundList;
+        
         Ground groundUpper;
         Ground groundUpper2;
-        List<Ground> upperGroundList;
+        //List<Ground> upperGroundList;
 
         public Game1()
         {
@@ -84,44 +87,50 @@ namespace BeardDefender_Monogame
             shark = new(new Vector2(100, 100));
             hedgehog = new Hedgehog(new Vector2(100, 100), Content.Load<Texture2D>("Hedgehog_Right"), 0.03f);
 
-
-            player = new Player(new Rectangle(100, 400, 25, 36));
+            
+            
+            player = new Player(new RectangleF(100, 400, 25, 36));
 
             // Obstacle/Ground. Kunde inte använda texturens Height/Width värden här,
             // 80 representerar Height, width är 640. Får klura ut hur man skulle kunna göra annars.
-            groundLower = new(new Rectangle(
+            groundLower = new (new RectangleF(
+
                 0,
                 _graphics.PreferredBackBufferHeight - 80,
                 _graphics.PreferredBackBufferWidth / 2,
                 80));
-            groundLower2 = new(new Rectangle(
+
+            groundLower2 = new (new RectangleF(
+
                 groundLower.Position.Right,
                 _graphics.PreferredBackBufferHeight - 80,
                 640 + 20,
                 80));
 
-            groundUpper = new(new Rectangle(
+            groundUpper = new(new RectangleF(
                 _graphics.PreferredBackBufferWidth / 4,
                 _graphics.PreferredBackBufferHeight - 80 * 2 + 50,
                 _graphics.PreferredBackBufferWidth - 640,
                 80));
-            groundUpper2 = new(new Rectangle(
+            groundUpper2 = new(new RectangleF(
                 _graphics.PreferredBackBufferWidth / 3,
                 _graphics.PreferredBackBufferHeight - 80 * 3 + 50,
                 _graphics.PreferredBackBufferWidth - 640,
                 80
                 ));
 
-            upperGroundList = new()
+            //upperGroundList = new()
+            //{
+                
+            //};
+            groundList = new()
             {
+                groundLower,
+                groundLower2,
                 groundUpper,
                 groundUpper2
             };
-            lowerGroundList = new()
-            {
-                groundLower,
-                groundLower2
-            };
+
 
             base.Initialize();
         }
@@ -154,13 +163,13 @@ namespace BeardDefender_Monogame
             shark.LoadContent(Content);
 
             // Ground
-            foreach (var item in upperGroundList)
+            //foreach (var item in upperGroundList)
+            //{
+            //    item.LoadContent(Content);
+            //}
+            foreach (Ground ground in groundList)
             {
-                item.LoadContent(Content);
-            }
-            foreach (var item in lowerGroundList)
-            {
-                item.LoadContent(Content);
+                ground.LoadContent(Content);
             }
         }
 
@@ -243,8 +252,7 @@ namespace BeardDefender_Monogame
             player.IsFacingRight =
                 player.MovePlayer(
                     keyboardState,
-                    upperGroundList,
-                    lowerGroundList);
+                    groundList);
 
             player.CurrentAnimation.Update(gameTime);
 
@@ -261,6 +269,7 @@ namespace BeardDefender_Monogame
 
 
             switch (activeScenes)
+
             {
                 case Scenes.MAIN_MENU:
 
@@ -290,20 +299,24 @@ namespace BeardDefender_Monogame
                     hedgehog.Draw(_spriteBatch);
 
                     //Ground
-                    foreach (var item in upperGroundList)
+                    foreach (var item in groundList)
                     {
                         item.Draw(_spriteBatch);
                     }
-                    foreach (var item in lowerGroundList)
-                    {
-                        item.Draw(_spriteBatch);
-                    }
+                    
                     break;
 
                 case Scenes.HIGHSCORE:
                     highscore.DrawBackground(_spriteBatch, MapWidth, MapHeight);
                     break;
             }
+
+            // SHAAAARKs draw metod sköter animationer beroende på åt vilket håll hajen rör sig.
+            shark.Draw(_spriteBatch);
+            hedgehog.Draw(_spriteBatch);
+
+            player.DrawPlayer(_spriteBatch);
+
 
             _spriteBatch.End();
             base.Draw(gameTime);
