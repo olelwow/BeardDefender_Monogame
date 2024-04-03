@@ -7,13 +7,24 @@ using System.Text.RegularExpressions;
 
 namespace BeardDefender_Monogame
 {
+    enum Scenes
+    {
+        MAIN_MENU,
+        GAME
+    };
     public class Game1 : Game
     {
+        private Scenes activeScenes;
+        //private Texture2D texture;
+
         // Important shit
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         const int MapWidth = 1320;
         const int MapHeight = 720;
+
+        // MainMenu object
+        MainMenu mainmenu;
 
         //Background object
         Background background;
@@ -29,13 +40,15 @@ namespace BeardDefender_Monogame
         Ground groundLower;
         Ground groundLower2;
         List<Ground> lowerGroundList;
-        
+
         Ground groundUpper;
         Ground groundUpper2;
         List<Ground> upperGroundList;
 
         public Game1()
         {
+            activeScenes = Scenes.MAIN_MENU;
+
             _graphics = new GraphicsDeviceManager(this);
             this.Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -50,21 +63,22 @@ namespace BeardDefender_Monogame
             _graphics.ApplyChanges();
 
             // Unit objects
+            mainmenu = new MainMenu();
             background = new Background();
             shark = new(new Vector2(100, 100));
             hedgehog = new Hedgehog(new Vector2(100, 100), Content.Load<Texture2D>("Hedgehog_Right"), 0.03f);
-            
-            
+
+
             player = new Player(new Rectangle(100, 400, 25, 36));
 
             // Obstacle/Ground. Kunde inte använda texturens Height/Width värden här,
             // 80 representerar Height, width är 640. Får klura ut hur man skulle kunna göra annars.
-            groundLower = new (new Rectangle(
+            groundLower = new(new Rectangle(
                 0,
                 _graphics.PreferredBackBufferHeight - 80,
                 _graphics.PreferredBackBufferWidth / 2,
                 80));
-            groundLower2 = new (new Rectangle(
+            groundLower2 = new(new Rectangle(
                 groundLower.Position.Right,
                 _graphics.PreferredBackBufferHeight - 80,
                 640 + 20,
@@ -92,13 +106,18 @@ namespace BeardDefender_Monogame
                 groundLower,
                 groundLower2
             };
-            
+
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
+            //texture = Content.Load<Texture2D>("BeardDefender_MainMenu");
+
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            //Laddar texturer för MainMenu.
+            mainmenu.LoadContent(Content);
 
             //Laddar texturer för Background.
             background.LoadContent(Content);
@@ -122,12 +141,39 @@ namespace BeardDefender_Monogame
 
         protected override void Update(GameTime gameTime)
         {
-            KeyboardState keyboardState = Keyboard.GetState();
-            if (keyboardState.IsKeyDown(Keys.Escape))
+            switch (activeScenes)
             {
-                Exit();
+                case Scenes.MAIN_MENU:
+
+                    if (Keyboard.GetState().IsKeyDown(Keys.Space))
+                    {
+                        activeScenes = Scenes.GAME;
+                    }
+                    if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+                    {
+                        Exit();
+                    }
+                    break;
+
+                case Scenes.GAME:
+                    //if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+                    //{
+                    //    activeScenes = Scenes.MAIN_MENU;
+                    //}
+                    if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+                    {
+                        Exit();
+                    }
+                    break;
+
             }
-            
+
+            KeyboardState keyboardState = Keyboard.GetState();
+            //if (keyboardState.IsKeyDown(Keys.Escape))
+            //{
+            //    Exit();
+            //}
+
             // Player pos Y för att stå på marken.
             player.position.Y = groundLower.Position.Y - (player.Texture.Height / 4);
 
@@ -138,14 +184,14 @@ namespace BeardDefender_Monogame
 
             // Player movement, sätter players variabel IsFacingRight till returvärdet av
             // metoden, som håller koll på vilket håll spelaren är riktad åt.
-            player.IsFacingRight = 
+            player.IsFacingRight =
                 player.MovePlayer(
                     keyboardState,
                     upperGroundList,
                     lowerGroundList);
 
             player.CurrentAnimation.Update(gameTime);
-            
+
             base.Update(gameTime);
         }
 
@@ -155,22 +201,37 @@ namespace BeardDefender_Monogame
 
             _spriteBatch.Begin();
 
-            background.DrawBackground(_spriteBatch, MapWidth, MapHeight);
-            player.DrawPlayer(_spriteBatch);
-
-            // SHAAAARKs draw metod sköter animationer beroende på åt vilket håll hajen rör sig.
-            shark.Draw(_spriteBatch);
-            hedgehog.Draw(_spriteBatch);
-
-            //Ground
-            foreach (var item in upperGroundList)
+            switch (activeScenes)
             {
-                item.Draw(_spriteBatch);
+                case Scenes.MAIN_MENU:
+
+                    //_spriteBatch.Draw(texture, new Rectangle(0, 0, MapWidth, MapHeight), Color.White);
+                    mainmenu.DrawMainMenu(_spriteBatch, MapWidth, MapHeight);
+
+                    break;
+
+                case Scenes.GAME:
+
+                    background.DrawBackground(_spriteBatch, MapWidth, MapHeight);
+
+                    player.DrawPlayer(_spriteBatch);
+
+                    // SHAAAARKs draw metod sköter animationer beroende på åt vilket håll hajen rör sig.
+                    shark.Draw(_spriteBatch);
+                    hedgehog.Draw(_spriteBatch);
+
+                    //Ground
+                    foreach (var item in upperGroundList)
+                    {
+                        item.Draw(_spriteBatch);
+                    }
+                    foreach (var item in lowerGroundList)
+                    {
+                        item.Draw(_spriteBatch);
+                    }
+                    break;
             }
-            foreach (var item in lowerGroundList)
-            {
-                item.Draw(_spriteBatch);
-            }
+
             _spriteBatch.End();
             base.Draw(gameTime);
         }
