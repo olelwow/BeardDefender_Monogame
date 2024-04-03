@@ -3,6 +3,8 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Numerics;
 using System.Text.RegularExpressions;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 
@@ -10,18 +12,20 @@ namespace BeardDefender_Monogame.GameObjects
 {
     internal class Player
     {
-        public Rectangle position;
-        private Rectangle positionNew;
+        public RectangleF position;
+        private RectangleF positionNew;
         private bool jumping;
+        private bool isOnBlock;
         private int jumpHeight;
-        private int speed = 5;
+        private float speed = 4.05f;
+        private float jumpingSpeed;
         private Texture2D texture;
         private bool isFacingRight;
         private Animation currentAnimation;
         private Animation idleAnimation;
         private Animation runAnimation;
 
-        public Player(Rectangle position)
+        public Player(RectangleF position)
         {
             this.position = position;
             this.positionNew = position;
@@ -37,19 +41,23 @@ namespace BeardDefender_Monogame.GameObjects
 
         public bool MovePlayer(
             KeyboardState keyboardState, 
-            List<Ground> upperGroundList,
-            List<Ground> lowerGroundList)
+            List<Ground> groundList
+            )
         {
-            GameMechanics.ApplyGravity(lowerGroundList, this);
+            GameMechanics.ApplyGravity(groundList, this);
 
             if (keyboardState.IsKeyDown(Keys.Left) || keyboardState.IsKeyDown(Keys.A))
             {
-                GameMechanics.CheckForCollisionsLeft(upperGroundList, keyboardState, this);
+                //GameMechanics.CheckForCollisionsLeft(upperGroundList, keyboardState, this);
+                this.position.X -= speed;
+                //GameMechanics.CheckForCollisionsGeneral(groundList, this);
                 isFacingRight = true;
             }
             else if (keyboardState.IsKeyDown(Keys.Right) || keyboardState.IsKeyDown(Keys.D))
             {
-                GameMechanics.CheckForCollisionsRight(upperGroundList, keyboardState, this);
+                //GameMechanics.CheckForCollisionsRight(upperGroundList, keyboardState, this);
+                this.position.X += speed;
+                //GameMechanics.CheckForCollisionsGeneral(groundList, this);
                 isFacingRight = false;
             }
             //if (keyboardState.IsKeyDown(Keys.Down) || keyboardState.IsKeyDown(Keys.S))
@@ -61,7 +69,7 @@ namespace BeardDefender_Monogame.GameObjects
                 if (!jumping)
                 {
                     jumping = true;
-                    jumpHeight = 100;
+                    jumpHeight = 150;
                 }
             }
 
@@ -92,7 +100,7 @@ namespace BeardDefender_Monogame.GameObjects
         {
             if (jumping)
             {
-                speed = 3;
+                jumpingSpeed = 3;
                 if (jumpHeight > -5)
                 {
                     // Minskar spelarens Y värde med värdet på jumpHeight,
@@ -106,8 +114,12 @@ namespace BeardDefender_Monogame.GameObjects
                 {
                     jumpHeight = 0;
                     jumping = false;
-                    speed = 5;
+                    jumpingSpeed = 5;
                 }
+            }
+            else
+            {
+                speed = 4.05f;
             }
         }
 
@@ -123,7 +135,7 @@ namespace BeardDefender_Monogame.GameObjects
                     this.Position.X,
                     this.Position.Y),
                 sourceRectangle: this.CurrentAnimation.CurrentFrameSourceRectangle(),
-                color: Color.White,
+                color: Microsoft.Xna.Framework.Color.White,
                 rotation: 0f,
                 origin: new Vector2(
                     this.CurrentAnimation.FrameWidth / 2,
@@ -136,7 +148,13 @@ namespace BeardDefender_Monogame.GameObjects
 
 
         // Get/Set
-        public int Speed
+
+        public bool IsOnBlock
+        {
+            get { return isOnBlock; }
+            set { isOnBlock = value; }
+        }
+        public float Speed
         {
             get { return speed; }
             set { speed = value; }
@@ -151,12 +169,12 @@ namespace BeardDefender_Monogame.GameObjects
             get { return isFacingRight; }
             set { isFacingRight = value; }
         }
-        public Rectangle PositionNew
+        public RectangleF PositionNew
         {
             get { return positionNew; }
             set { positionNew = value; }
         }
-        public Rectangle Position
+        public RectangleF Position
         {
             get { return position; }
             set
