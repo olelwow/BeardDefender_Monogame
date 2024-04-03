@@ -26,6 +26,11 @@ namespace BeardDefender_Monogame
         bool startGameSelected = true; // Starta spelet är förvalt
         bool exitGameSelected = false;
 
+        private bool previousUpPressed = false;
+        private bool previousDownPressed = false;
+        private bool previousEnterPressed = false;
+
+
 
         // MainMenu object
         MainMenu mainmenu;
@@ -119,18 +124,18 @@ namespace BeardDefender_Monogame
         {
             //texture = Content.Load<Texture2D>("BeardDefender_MainMenu");
 
-           
-       
-         _spriteBatch = new SpriteBatch(GraphicsDevice);
-          buttonFont = Content.Load<SpriteFont>("Font"); 
-       
 
-        _spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
+            buttonFont = Content.Load<SpriteFont>("Font");
+
+
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             //Laddar texturer för MainMenu.
             mainmenu.LoadContent(Content);
 
-            
+
 
             //Laddar texturer för Background.
             background.LoadContent(Content);
@@ -161,33 +166,31 @@ namespace BeardDefender_Monogame
 
                 case Scenes.MAIN_MENU:
 
-                    //if (Keyboard.GetState().IsKeyDown(Keys.Space))
-                    //{
-                    //    activeScenes = Scenes.GAME;
-                    //}
-                    //if (Keyboard.GetState().IsKeyDown(Keys.Escape))
-                    //{
-                    //    Exit();
-                    //}
-
                     KeyboardState state = Keyboard.GetState();
-                    if (state.IsKeyDown(Keys.Up) || state.IsKeyDown(Keys.Down))
+
+
+                    bool upDownPressed = state.IsKeyDown(Keys.Up) || state.IsKeyDown(Keys.Down);
+                    if (upDownPressed && !previousUpPressed && !previousDownPressed)
                     {
                         startGameSelected = !startGameSelected;
                         exitGameSelected = !exitGameSelected;
                     }
 
-                    if (startGameSelected == true && state.IsKeyDown(Keys.Enter))
+                    if (state.IsKeyDown(Keys.Enter) && !previousEnterPressed)
                     {
-                        activeScenes = Scenes.GAME;
-
+                        if (startGameSelected)
+                        {
+                            activeScenes = Scenes.GAME;
+                        }
+                        else if (exitGameSelected)
+                        {
+                            Exit();
+                        }
                     }
 
-                    if (exitGameSelected == true && state.IsKeyDown(Keys.Enter))
-                    {
-                        Exit();
-
-                    }
+                    previousUpPressed = state.IsKeyDown(Keys.Up);
+                    previousDownPressed = state.IsKeyDown(Keys.Down);
+                    previousEnterPressed = state.IsKeyDown(Keys.Enter);
 
 
                     break;
@@ -197,10 +200,7 @@ namespace BeardDefender_Monogame
                     {
                         activeScenes = Scenes.MAIN_MENU;
                     }
-                    //if (Keyboard.GetState().IsKeyDown(Keys.Escape))
-                    //{
-                    //    Exit();
-                    //}
+
                     break;
 
             }
@@ -238,7 +238,7 @@ namespace BeardDefender_Monogame
 
             _spriteBatch.Begin();
 
-           
+
 
 
             switch (activeScenes)
@@ -249,10 +249,10 @@ namespace BeardDefender_Monogame
                     mainmenu.DrawMainMenu(_spriteBatch, MapWidth, MapHeight);
 
                     // Ritar "Starta spelet"-val
-                    _spriteBatch.DrawString(buttonFont, "Starta spelet", new Vector2(100, 100), startGameSelected ? Color.Yellow : Color.White);
+                    _spriteBatch.DrawString(buttonFont, "PLAY", new Vector2(635, 390), startGameSelected ? Color.Red : Color.Black);
 
                     // Ritar "Avsluta spelet"-val
-                    _spriteBatch.DrawString(buttonFont, "Avsluta spelet", new Vector2(100, 140), exitGameSelected ? Color.Yellow : Color.White);
+                    _spriteBatch.DrawString(buttonFont, "EXIT GAME", new Vector2(600, 595), exitGameSelected ? Color.Red : Color.Black);
 
 
                     break;
