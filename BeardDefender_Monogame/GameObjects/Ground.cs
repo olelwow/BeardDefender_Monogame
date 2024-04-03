@@ -1,16 +1,18 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using System.Drawing;
 using System.Text.RegularExpressions;
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace BeardDefender_Monogame.GameObjects
 {
     internal class Ground
     {
         Texture2D texture;
-        Rectangle position;
+        RectangleF position;
 
-        public Ground(Rectangle position) 
+        public Ground(RectangleF position) 
         {
             this.position = position;
         }
@@ -23,12 +25,12 @@ namespace BeardDefender_Monogame.GameObjects
         {
             _spriteBatch.Draw(
                 this.texture,
-                this.position,
+                new Vector2 (this.position.X, this.position.Y),
                 Color.White);
         }
 
         // Get/Set
-        public Rectangle Position
+        public RectangleF Position
         {
             get { return position; }
             set
