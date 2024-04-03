@@ -41,7 +41,7 @@ namespace BeardDefender_Monogame.GameObjects
             Rectangle destinationRectangle = new Rectangle(0, 0, (int)desiredSize.X, (int)desiredSize.Y);
             //Vector2 scale = new Vector2(20f, 20f);
             
-            _spriteBatch.Draw(Background1, destinationRectangle, Color.White);           
+            _spriteBatch.Draw(Background1, destinationRectangle, Color.White);
             _spriteBatch.Draw(Background2, destinationRectangle, Color.White);
             _spriteBatch.Draw(Background3, destinationRectangle, Color.White);
             _spriteBatch.Draw(Background4, destinationRectangle, Color.White);
