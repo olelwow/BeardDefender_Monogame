@@ -21,7 +21,6 @@ namespace BeardDefender_Monogame
         // Unit objects
         Shark shark;
         Hedgehog hedgehog;
-        //List<Enemy> enemyList;
 
         //Player object
         Player player;
@@ -34,29 +33,6 @@ namespace BeardDefender_Monogame
         Ground groundUpper;
         Ground groundUpper2;
         List<Ground> upperGroundList;
-
-        /* 
-        * !Allt nedan har lagts in i sina respektive klasser!
-        */
-        //Texture2D ground;
-        //Rectangle groundPosition;
-        //Texture2D groundCon;
-        //Rectangle groundPositionCon;
-        //Texture2D groundNext;
-        //Rectangle groundPositionNext;
-        //int sharkFrameIndex;
-        //private Animation idleAnimation;
-        //private Animation runAnimation;
-        //private Animation currentAnimation;
-        //private bool isFacingRight;
-        //private CollisionComponent _collisionComponent;
-        //Texture2D player;
-        //Rectangle playerPositionPrevious;
-        //Rectangle playerPositionNew;
-        //Rectangle currentPosition;
-        //float playerSpeed;
-        //Vector2 playerPosition;
-        //Texture2D player;
 
         public Game1()
         {
@@ -77,11 +53,7 @@ namespace BeardDefender_Monogame
             background = new Background();
             shark = new(new Vector2(100, 100));
             hedgehog = new Hedgehog(new Vector2(100, 100), Content.Load<Texture2D>("Hedgehog_Right"), 0.03f);
-            //enemyList = new() 
-            //{
-            //    shark,
-            //    hedgehog 
-            //};
+            
             
             player = new Player(new Rectangle(100, 400, 25, 36));
 
@@ -109,7 +81,6 @@ namespace BeardDefender_Monogame
                 _graphics.PreferredBackBufferWidth - 640,
                 80
                 ));
-            //_collisionComponent.Insert();   //Titta vidare (NEJ)
 
             upperGroundList = new()
             {
@@ -128,18 +99,6 @@ namespace BeardDefender_Monogame
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            //Texturer för player1
-            //player1.CurrentAnimation = idleAnimation;
-            //player1.RunAnimation = runAnimation;
-            //player1.IdleAnimation = idleAnimation;
-            //player1.Texture = Content.Load<Texture2D>("Run-Right");
-            //currentAnimation = idleAnimation;
-            //idleAnimation = new Animation(Content.Load<Texture2D>("Idle-Left"), 0.1f, true);
-            //runAnimation = new Animation(Content.Load<Texture2D>("Run-LEFT"), 0.1f, true);
-
-            /* 
-             * !Allt ovan har lagts in i sina respektive klasser!
-             */
 
             //Laddar texturer för Background.
             background.LoadContent(Content);
@@ -159,11 +118,6 @@ namespace BeardDefender_Monogame
             {
                 item.LoadContent(Content);
             }
-            //ground.LoadContent(Content);
-            //groundCon.LoadContent(Content);
-            //groundNext.LoadContent(Content);
-
-            // TODO: use this.Content to load your game content here
         }
 
         protected override void Update(GameTime gameTime)
@@ -173,14 +127,7 @@ namespace BeardDefender_Monogame
             {
                 Exit();
             }
-            //ground.Position.Y = _graphics.PreferredBackBufferHeight - ground.Position.Height;
-            //groundCon.Position = new Rectangle(
-            //        _graphics.PreferredBackBufferWidth / 4,
-            //        _graphics.PreferredBackBufferHeight - ground.Position.Height * 2,
-            //        _graphics.PreferredBackBufferWidth - groundCon.Position.Width,
-            //        groundCon.Position.Height
-            //        );
-
+            
             // Player pos Y för att stå på marken.
             player.position.Y = groundLower.Position.Y - (player.Texture.Height / 4);
 
@@ -224,44 +171,6 @@ namespace BeardDefender_Monogame
             {
                 item.Draw(_spriteBatch);
             }
-            //ground.Draw(_spriteBatch);
-            //groundCon.Draw(_spriteBatch);
-            //groundNext.Draw(_spriteBatch);
-
-            // Draw sköts nu av ground objekten.
-
-            //_spriteBatch.Draw(
-            //    ground,
-            //    groundPosition = new Rectangle(
-            //        0,
-            //        _graphics.PreferredBackBufferHeight - ground.Height,
-            //        _graphics.PreferredBackBufferWidth / 2,
-            //        ground.Height
-            //        ),
-            //    Color.White);
-
-            //_spriteBatch.Draw(
-            //    ground,
-            //    groundPositionCon = new Rectangle(
-            //        _graphics.PreferredBackBufferWidth / 4,
-            //        _graphics.PreferredBackBufferHeight - ground.Height * 2,
-            //        _graphics.PreferredBackBufferWidth - groundCon.Width,
-            //        groundCon.Height
-            //        ),
-            //    Color.White);
-
-            //_spriteBatch.Draw(
-            //    ground,
-            //    groundPositionNext = new Rectangle(
-            //        groundPosition.Right,
-            //        _graphics.PreferredBackBufferHeight - groundNext.Height,
-            //        ground.Width + 20,
-            //        groundNext.Height
-            //        ),
-            //    Color.White);
-
-            // Draw sköts nu av ground objekten.
-
             _spriteBatch.End();
             base.Draw(gameTime);
         }
