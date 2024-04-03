@@ -5,7 +5,7 @@ namespace BeardDefender_Monogame.GameObjects
 {
     internal class Hedgehog : Enemy
     {
-        private Vector2 position;
+        public Vector2 position;
         private Texture2D texture;
         private float speed = 150f;
         private float detectionRange = 2000f; // Adjust this value to change the detection range
@@ -37,5 +37,10 @@ namespace BeardDefender_Monogame.GameObjects
             spriteBatch.Draw(texture, destinationRect, Color.LightSkyBlue);
         }
 
+        public Vector2 Position
+        {
+            get { return position; }
+            set { position = value; }
+        }
     }
 }

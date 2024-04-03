@@ -58,10 +58,7 @@ namespace BeardDefender_Monogame
         Ground groundLower2;
 
         List<Ground> groundList;
-        
-        Ground groundUpper;
-        Ground groundUpper2;
-        //List<Ground> upperGroundList;
+       
 
         public Game1()
         {
@@ -85,7 +82,7 @@ namespace BeardDefender_Monogame
             highscore = new Highscore();
             background = new Background();
             shark = new(new Vector2(100, 100));
-            hedgehog = new Hedgehog(new Vector2(100, 100), Content.Load<Texture2D>("Hedgehog_Right"), 0.03f);
+            hedgehog = new Hedgehog(new Vector2(400, 400), Content.Load<Texture2D>("Hedgehog_Right"), 0.03f);
 
             
             
@@ -107,30 +104,11 @@ namespace BeardDefender_Monogame
                 640 + 20,
                 80));
 
-            groundUpper = new(new RectangleF(
-                _graphics.PreferredBackBufferWidth / 4,
-                _graphics.PreferredBackBufferHeight - 80 * 2 + 50,
-                _graphics.PreferredBackBufferWidth - 640,
-                80));
-            groundUpper2 = new(new RectangleF(
-                _graphics.PreferredBackBufferWidth / 3,
-                _graphics.PreferredBackBufferHeight - 80 * 3 + 50,
-                _graphics.PreferredBackBufferWidth - 640,
-                80
-                ));
-
-            //upperGroundList = new()
-            //{
-                
-            //};
             groundList = new()
             {
                 groundLower,
                 groundLower2,
-                groundUpper,
-                groundUpper2
             };
-
 
             base.Initialize();
         }
@@ -252,6 +230,7 @@ namespace BeardDefender_Monogame
             player.IsFacingRight =
                 player.MovePlayer(
                     keyboardState,
+                    hedgehog,
                     groundList);
 
             player.CurrentAnimation.Update(gameTime);
@@ -310,13 +289,6 @@ namespace BeardDefender_Monogame
                     highscore.DrawBackground(_spriteBatch, MapWidth, MapHeight);
                     break;
             }
-
-            // SHAAAARKs draw metod sköter animationer beroende på åt vilket håll hajen rör sig.
-            shark.Draw(_spriteBatch);
-            hedgehog.Draw(_spriteBatch);
-
-            player.DrawPlayer(_spriteBatch);
-
 
             _spriteBatch.End();
             base.Draw(gameTime);
