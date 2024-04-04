@@ -24,15 +24,10 @@ namespace BeardDefender_Monogame
             // än ground-objektets Y-värde.
             foreach (var ground in groundList)
             {
-                if (player.Jumping)
-                {
-                    player.Speed = 5.2f;
-                }
                 if (player.Position.Y + player.position.Height >= ground.Position.Y && !player.Jumping)
                 {
                     // Ifall spelarens Y är större eller lika med ground Y så sätts spelarens Y till marknivå och loopen avslutas.
                     player.position.Y = ground.Position.Y - player.position.Height / 2;
-                    player.Speed = 4.05f;
                     return;
                 }
                 else if (!player.Jumping)

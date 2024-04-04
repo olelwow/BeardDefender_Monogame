@@ -45,6 +45,7 @@ namespace BeardDefender_Monogame
 
         //Background object
         Background background;
+        Background background2;
 
         // Unit objects
         Shark shark;
@@ -56,6 +57,9 @@ namespace BeardDefender_Monogame
         // Obstacles/Ground
         Ground groundLower;
         Ground groundLower2;
+        Ground groundLower3;
+        Ground groundLower4;
+        Ground groundLower5;
 
         List<Ground> groundList;
        
@@ -80,12 +84,10 @@ namespace BeardDefender_Monogame
             // Unit objects
             mainmenu = new MainMenu();
             highscore = new Highscore();
-            background = new Background();
+            background = new Background(0);
+            background2 = new Background(1320);
             shark = new(new Vector2(100, 100));
-            hedgehog = new Hedgehog(new Vector2(400, 400), Content.Load<Texture2D>("Hedgehog_Right"), 0.03f);
 
-            
-            
             player = new Player(new RectangleF(100, 400, 25, 36));
 
             // Obstacle/Ground. Kunde inte använda texturens Height/Width värden här,
@@ -99,29 +101,45 @@ namespace BeardDefender_Monogame
 
             groundLower2 = new (new RectangleF(
 
-                groundLower.Position.Right,
+                groundLower.Position.Right - 20,
                 _graphics.PreferredBackBufferHeight - 80,
                 640 + 20,
                 80));
+            groundLower3 = new(new RectangleF(
+                groundLower2.Position.Right - 20,
+                _graphics.PreferredBackBufferHeight - 80,
+                groundLower2.Position.Width,
+                groundLower2.Position.Height
+                ));
+            groundLower4 = new(new RectangleF(
+                groundLower3.Position.Right - 20,
+                _graphics.PreferredBackBufferHeight - 80,
+                groundLower3.Position.Width,
+                groundLower3.Position.Height
+                ));
+            groundLower5 = new(new RectangleF(
+                groundLower4.Position.Right - 20,
+                _graphics.PreferredBackBufferHeight - 80,
+                groundLower4.Position.Width,
+                groundLower4.Position.Height
+                ));
 
             groundList = new()
             {
                 groundLower,
                 groundLower2,
+                groundLower3,
+                groundLower4,
+                groundLower5,
             };
-
+            hedgehog = new Hedgehog(new Vector2(400, groundLower.Position.Y - 50), Content.Load<Texture2D>("Hedgehog_Right"), 0.03f);
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
-            //texture = Content.Load<Texture2D>("BeardDefender_MainMenu");
-
-
-
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             buttonFont = Content.Load<SpriteFont>("Font");
-
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
@@ -130,6 +148,7 @@ namespace BeardDefender_Monogame
 
             //Laddar texturer för Background.
             background.LoadContent(Content);
+            background2.LoadContent(Content);
 
             //laddar texturer för Highscore
             highscore.LoadContent(Content);
@@ -139,12 +158,7 @@ namespace BeardDefender_Monogame
 
             // Texturer för shark
             shark.LoadContent(Content);
-
             // Ground
-            //foreach (var item in upperGroundList)
-            //{
-            //    item.LoadContent(Content);
-            //}
             foreach (Ground ground in groundList)
             {
                 ground.LoadContent(Content);
@@ -155,9 +169,6 @@ namespace BeardDefender_Monogame
         {
             switch (activeScenes)
             {
-
-
-
                 case Scenes.MAIN_MENU:
 
                     KeyboardState state = Keyboard.GetState();
@@ -212,14 +223,15 @@ namespace BeardDefender_Monogame
             }
 
             KeyboardState keyboardState = Keyboard.GetState();
-            //if (keyboardState.IsKeyDown(Keys.Escape))
-            //{
-            //    Exit();
-            //}
 
             // Player pos Y för att stå på marken.
             player.position.Y = groundLower.Position.Y - (player.Texture.Height / 4);
-
+            background.Update(gameTime, GraphicsDevice.Viewport.Width);
+            background2.Update(gameTime, GraphicsDevice.Viewport.Width);
+            foreach (Ground ground in groundList)
+            {
+                ground.Update(gameTime, GraphicsDevice.Viewport.Width);
+            }
             // Shark movement, returnerar rätt frame index som används i Update.
             shark.CurrentFrameIndex = shark.Update(_graphics, gameTime);
             // Hedgehog movement.
@@ -244,9 +256,6 @@ namespace BeardDefender_Monogame
 
             _spriteBatch.Begin();
 
-
-
-
             switch (activeScenes)
 
             {
@@ -270,6 +279,7 @@ namespace BeardDefender_Monogame
                 case Scenes.GAME:
 
                     background.DrawBackground(_spriteBatch, MapWidth, MapHeight);
+                    background2.DrawBackground(_spriteBatch, MapWidth, MapHeight);
 
                     player.DrawPlayer(_spriteBatch);
 

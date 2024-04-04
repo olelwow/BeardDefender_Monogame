@@ -24,7 +24,6 @@ namespace BeardDefender_Monogame.GameObjects
         private Animation currentAnimation;
         private Animation idleAnimation;
         private Animation runAnimation;
-        private Hedgehog hedgehog;
 
         public Player(RectangleF position)
         {
@@ -51,22 +50,14 @@ namespace BeardDefender_Monogame.GameObjects
 
             if (keyboardState.IsKeyDown(Keys.Left) || keyboardState.IsKeyDown(Keys.A))
             {
-                //GameMechanics.CheckForCollisionsLeft(upperGroundList, keyboardState, this);
                 this.position.X -= speed;
-                //GameMechanics.CheckForCollisionsGeneral(groundList, this);
                 isFacingRight = true;
             }
             else if (keyboardState.IsKeyDown(Keys.Right) || keyboardState.IsKeyDown(Keys.D))
             {
-                //GameMechanics.CheckForCollisionsRight(upperGroundList, keyboardState, this);
                 this.position.X += speed;
-                //GameMechanics.CheckForCollisionsGeneral(groundList, this);
                 isFacingRight = false;
             }
-            //if (keyboardState.IsKeyDown(Keys.Down) || keyboardState.IsKeyDown(Keys.S))
-            //{
-            //    position.Y += 0;
-            //}
             if (keyboardState.IsKeyDown(Keys.Space))
             {
                 if (!jumping)
@@ -119,10 +110,6 @@ namespace BeardDefender_Monogame.GameObjects
                     jumping = false;
                     jumpingSpeed = 5;
                 }
-            }
-            else
-            {
-                speed = 4.05f;
             }
         }
 

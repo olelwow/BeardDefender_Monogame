@@ -16,9 +16,14 @@ namespace BeardDefender_Monogame.GameObjects
         private Texture2D background2;
         private Texture2D background3;
         private Texture2D background4;
+        private int posX;
+        private int posY;
 
 
-
+        public Background (int startX)
+        {
+            this.posX = startX;
+        }
 
     public void LoadContent(ContentManager Content)
     {
@@ -29,8 +34,17 @@ namespace BeardDefender_Monogame.GameObjects
         this.Background4 = Content.Load<Texture2D>("Bakgrund4");
     }
 
-        public void Update(GameTime gameTime)
+        public void Update(GameTime gameTime, int screenWidth)
         {
+            // Update position to scroll backgrounds
+            this.posX -= 1; // Adjust the scrolling speed as needed
+
+            // Check if the backgrounds have scrolled beyond the screen width
+            if (this.posX <= -screenWidth)
+            {
+                // Reset the position to the right side of the screen
+                this.posX = 1320;
+            }
         }
 
         public void DrawBackground(SpriteBatch _spriteBatch, int MapWidth, int MapHeight)
@@ -38,7 +52,7 @@ namespace BeardDefender_Monogame.GameObjects
             //Skapar en rektangel i storlek med spelrutan och förstorar bakgrundsbilderna-
             //till samma storlek som spelytan.
             Vector2 desiredSize = new Vector2(MapWidth, MapHeight);
-            Rectangle destinationRectangle = new Rectangle(0, 0, (int)desiredSize.X, (int)desiredSize.Y);
+            Rectangle destinationRectangle = new Rectangle(posX, posY, (int)desiredSize.X, (int)desiredSize.Y);
             //Vector2 scale = new Vector2(20f, 20f);
             
             _spriteBatch.Draw(Background1, destinationRectangle, Color.White);
