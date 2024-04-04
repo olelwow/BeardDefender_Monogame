@@ -63,6 +63,12 @@ namespace BeardDefender_Monogame
         Ground groundLower5;
 
         List<Ground> groundList;
+
+        //Score grejer
+        double score = 0;
+        Texture2D ScoreBox;
+        Vector2 ScoreBoxPosition;
+        SpriteFont ScoreFont;
        
 
         public Game1()
@@ -90,6 +96,7 @@ namespace BeardDefender_Monogame
             shark = new(new Vector2(100, 100));
             crabman = new Crabman();
 
+            ScoreBoxPosition = new Vector2(0, 15);
             player = new Player(new RectangleF(100, 400, 25, 36));
 
             // Obstacle/Ground. Kunde inte använda texturens Height/Width värden här,
@@ -151,6 +158,10 @@ namespace BeardDefender_Monogame
             //Laddar texturer för Background.
             background.LoadContent(Content);
             background2.LoadContent(Content);
+
+            //Laddar texturer för scorebox
+            ScoreBox = Content.Load<Texture2D>("ScoreBox");
+            ScoreFont = Content.Load<SpriteFont>("ScoreFont");
 
             //laddar texturer för Highscore
             highscore.LoadContent(Content);
@@ -251,6 +262,9 @@ namespace BeardDefender_Monogame
             // Hedgehog movement.
             hedgehog.Update(gameTime, new Vector2(player.position.X, player.position.Y));
 
+            //Updaterar score i sammaband med spelets timer
+            score += (double)gameTime.ElapsedGameTime.TotalSeconds;
+
             // Player movement, sätter players variabel IsFacingRight till returvärdet av
             // metoden, som håller koll på vilket håll spelaren är riktad åt.
             player.IsFacingRight =
@@ -296,6 +310,12 @@ namespace BeardDefender_Monogame
 
                     background.DrawBackground(_spriteBatch, MapWidth, MapHeight);
                     background2.DrawBackground(_spriteBatch, MapWidth, MapHeight);
+
+                    //ScoreBox Texturer rittas här
+                    _spriteBatch.Draw(ScoreBox, ScoreBoxPosition, Color.White);
+                    _spriteBatch.DrawString(ScoreFont, "Score : ", new Vector2(28, 30), Color.Black);
+                    _spriteBatch.DrawString(ScoreFont, ((int)score).ToString(), new Vector2(138, 30), Color.Black);
+
 
                     player.DrawPlayer(_spriteBatch);
 
