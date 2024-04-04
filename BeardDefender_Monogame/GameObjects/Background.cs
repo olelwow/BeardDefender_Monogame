@@ -40,7 +40,7 @@ namespace BeardDefender_Monogame.GameObjects
             if (this.isPlayerMoving)
             {
                 // Adjust the scrolling speed based on player speed or a fixed value
-                int scrollSpeedAdjustment = Math.Max(1, playerSpeed); 
+                int scrollSpeedAdjustment = Math.Max(1, playerSpeed);
                 this.posX -= scrollSpeedAdjustment;
             }
 
@@ -52,7 +52,7 @@ namespace BeardDefender_Monogame.GameObjects
             {
 
                 // Reset the position to the right side of the screen
-                this.posX = screenWidth; 
+                this.posX = screenWidth;
             }
 
         }
