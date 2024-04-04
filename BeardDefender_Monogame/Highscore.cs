@@ -14,8 +14,7 @@ namespace BeardDefender_Monogame
         public void LoadContent(ContentManager Content)
         {
             //Hämtar in respektive bild i variabler.
-            this.Highscorebackground = Content.Load<Texture2D>("highscore_screen");
-    
+            this.Highscorebackground = Content.Load<Texture2D>("highscore_screen");    
         }
 
         public void Update(GameTime gameTime)

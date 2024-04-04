@@ -2,93 +2,186 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Numerics;
+using System.Reflection.Metadata;
 using System.Text.RegularExpressions;
+using Color = Microsoft.Xna.Framework.Color;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace BeardDefender_Monogame.GameObjects
 {
     internal class Player
     {
-        public RectangleF position;
-        private RectangleF positionNew;
-        private bool jumping;
-        private bool isOnBlock;
-        private int jumpHeight;
-        private float speed = 4.05f;
-        private float jumpingSpeed;
-        private Texture2D texture;
+        //private RectangleF positionNew;
+        //private bool jumping;
+        //private bool isOnBlock;
+        //private int jumpHeight;
+        //private float speed = 4.05f;
+        //private float jumpingSpeed;
+
+        private Hedgehog hedgehog;
+
+        public Vector2 position;
+        public Vector2 velocity;
         private bool isFacingRight;
+        private Texture2D texture;
         private Animation currentAnimation;
         private Animation idleAnimation;
         private Animation runAnimation;
-        private Hedgehog hedgehog;
+        private Animation jumpAnimation;
+        private SpriteBatch spriteBatch;
+        private bool isOnGround;
 
-        public Player(RectangleF position)
+        private const float MoveAcceleration = 1000.0f; // Minskad för långsammare acceleration
+        private const float MaxMoveSpeed = 200.0f; // Minskad för lägre maxhastighet
+        private const float GroundDragFactor = 0.58f;
+        private const float AirDragFactor = 0.65f;
+        private const float MaxJumpTime = 0.25f; // Justera för att påverka hur länge spelaren kan påverka hoppet uppåt
+        private const float JumpLaunchVelocity = -1000.0f; // Högre värde för högre hopp
+        private const float GravityAcceleration = 1500.0f; // Öka för snabbare fall, minska för långsammare
+        private const float MaxFallSpeed = 450.0f; // Justera max fallhastighet
+        private const float JumpControlPower = 0.14f; // Justera för att påverka spelarens kontroll under hoppet
+
+        float jumpTime;
+        bool isJumping;
+
+        public Player(Vector2 position, SpriteBatch spriteBatch)
         {
             this.position = position;
-            this.positionNew = position;
-        }
-        
-        public void LoadContent (ContentManager Content)
-        {
-            this.idleAnimation = new Animation(Content.Load<Texture2D>("Idle-Left"), 0.1f, true);
-            this.runAnimation = new Animation(Content.Load<Texture2D>("Run-LEFT"), 0.1f, true);
-            this.texture = Content.Load<Texture2D>("Run-Right");
-            this.currentAnimation = runAnimation;
+            this.spriteBatch = spriteBatch;
+            isFacingRight = true;
         }
 
-        public bool MovePlayer(
-            KeyboardState keyboardState, 
-            Hedgehog hedgehog,
-            List<Ground> groundList
-            )
+        public void LoadContent(ContentManager Content)
         {
-            GameMechanics.ApplyGravity(groundList, this, hedgehog);
-            GameMechanics.EnemyCollision(hedgehog, this);
+            idleAnimation = new Animation(Content.Load<Texture2D>("Idle-Left"), 0.1f, true);
+            runAnimation = new Animation(Content.Load<Texture2D>("Run-LEFT"), 0.1f, true);
+            jumpAnimation = new Animation(Content.Load<Texture2D>("Jump-Left"), 0.1f, false);
+            texture = Content.Load<Texture2D>("Run-Right"); // Byt ut mot din spelartextur
 
-            if (keyboardState.IsKeyDown(Keys.Left) || keyboardState.IsKeyDown(Keys.A))
+            currentAnimation = idleAnimation;
+
+
+        }
+
+        public void MovePlayer(GameTime gameTime, KeyboardState keyboardState, List<Ground> groundList)
+        {
+            // Hantera inmatning från användaren
+            GetInput(keyboardState);
+
+            // Tillämpa rörelse, gravitation och hopplogik
+            ApplyPhysics(gameTime);
+
+            // Hantera kollisioner med marken för att uppdatera `isOnGround` och justera `position` vid behov
+            HandleCollisions(groundList);
+
+            // Uppdatera spelarens animation baserat på dess tillstånd (springer, står still, hoppar)
+            UpdateAnimations(gameTime);
+        }
+
+        public void Update(GameTime gameTime, KeyboardState keyboardState, List<Ground> groundList)
+        {
+            GetInput(keyboardState);
+            ApplyPhysics(gameTime);
+            HandleCollisions(groundList);
+            UpdateAnimations(gameTime);
+            currentAnimation.Update(gameTime);
+        }
+
+        private void GetInput(KeyboardState keyboardState)
+        {
+            isJumping = keyboardState.IsKeyDown(Keys.Space);
+
+            if (keyboardState.IsKeyDown(Keys.A) || keyboardState.IsKeyDown(Keys.Left))
             {
-                //GameMechanics.CheckForCollisionsLeft(upperGroundList, keyboardState, this);
-                this.position.X -= speed;
-                //GameMechanics.CheckForCollisionsGeneral(groundList, this);
-                isFacingRight = true;
-            }
-            else if (keyboardState.IsKeyDown(Keys.Right) || keyboardState.IsKeyDown(Keys.D))
-            {
-                //GameMechanics.CheckForCollisionsRight(upperGroundList, keyboardState, this);
-                this.position.X += speed;
-                //GameMechanics.CheckForCollisionsGeneral(groundList, this);
                 isFacingRight = false;
+                velocity.X = -MoveAcceleration;
             }
-            //if (keyboardState.IsKeyDown(Keys.Down) || keyboardState.IsKeyDown(Keys.S))
-            //{
-            //    position.Y += 0;
-            //}
-            if (keyboardState.IsKeyDown(Keys.Space))
+            else if (keyboardState.IsKeyDown(Keys.D) || keyboardState.IsKeyDown(Keys.Right))
             {
-                if (!jumping)
+                isFacingRight = true;
+                velocity.X = MoveAcceleration;
+            }
+            else
+            {
+                velocity.X = 0;
+            }
+            if (keyboardState.IsKeyDown(Keys.Space) && isOnGround)
+            {
+                isOnGround = false;
+                isJumping = true;
+                jumpTime = 0.0f;
+            }
+            else if (keyboardState.IsKeyUp(Keys.Space))
+            {
+                // Kontrollera hoppet genom att släppa hoppknappen
+                isJumping = false;
+            }
+        }
+
+        private void ApplyPhysics(GameTime gameTime)
+        {
+            float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            if (isJumping)
+            {
+                // Om spelaren fortfarande håller i hoppknappen men inte har hoppat för länge, fortsätt att ge hoppkraft uppåt
+                if (jumpTime > 0.0f)
                 {
-                    jumping = true;
-                    jumpHeight = 150;
+                    velocity.Y += JumpLaunchVelocity * (1.0f - (float)Math.Pow(jumpTime / MaxJumpTime, JumpControlPower));
+                }
+
+                jumpTime += elapsed;
+            }
+
+            velocity.Y = MathHelper.Clamp(velocity.Y + GravityAcceleration * elapsed, -MaxFallSpeed, MaxFallSpeed);
+            velocity.X *= (isOnGround ? GroundDragFactor : AirDragFactor);
+
+            position += velocity * elapsed;
+            position = new Vector2((float)Math.Round(position.X), (float)Math.Round(position.Y));
+
+            // Återställ hoppet när spelaren landar på marken
+            if (position.Y > 720) 
+            {
+                position.Y = 720;
+                isOnGround = true;
+                isJumping = false;
+                velocity.Y = 0;
+            }
+        }
+
+        private void HandleCollisions(List<Ground> groundList)
+        {
+            isOnGround = false; 
+            foreach (var ground in groundList)
+            {
+                if (position.Y + texture.Height > ground.Position.Y &&
+                    position.X < ground.Position.X + ground.Position.Width &&
+                    position.X + texture.Width > ground.Position.X &&
+                    position.Y < ground.Position.Y + ground.Position.Height)
+                {
+                    float groundTop = ground.Position.Y;
+                    float playerBottom = position.Y + texture.Height;
+                    if (playerBottom <= groundTop + velocity.Y)
+                    {
+                        isOnGround = true;
+                        velocity.Y = 0;
+                        position.Y = groundTop - texture.Height;
+                    }
                 }
             }
+        }
 
-            if (jumping)
+        private void UpdateAnimations(GameTime gameTime)
+        {
+            if (!isOnGround)
             {
-                Jump();
+                currentAnimation = jumpAnimation;
             }
-
-            if (keyboardState.IsKeyDown(Keys.W) ||
-                keyboardState.IsKeyDown(Keys.Up) ||
-                keyboardState.IsKeyDown(Keys.S) ||
-                keyboardState.IsKeyDown(Keys.Down) ||
-                keyboardState.IsKeyDown(Keys.A) ||
-                keyboardState.IsKeyDown(Keys.Left) ||
-                keyboardState.IsKeyDown(Keys.D) ||
-                keyboardState.IsKeyDown(Keys.Right))
+            else if (/*Math.Abs(velocity.X) > 0*/Math.Abs(velocity.X) - 0.02f > 0)
             {
                 currentAnimation = runAnimation;
             }
@@ -96,120 +189,28 @@ namespace BeardDefender_Monogame.GameObjects
             {
                 currentAnimation = idleAnimation;
             }
-            return isFacingRight;
-        }
 
-        public void Jump ()
-        {
-            if (jumping)
+            if (isJumping)
             {
-                jumpingSpeed = 3;
-                if (jumpHeight > -5)
-                {
-                    // Minskar spelarens Y värde med värdet på jumpHeight,
-                    // minskar värdet på jumpHeight med -2 vid varje check.
-                    // Spelaren flyttas snabbt upp till högsta punkten i nuvarande kod,
-                    // får kollas på senare... Jag trött.
-                    position.Y -= jumpHeight; 
-                    jumpHeight -= 2; 
-                }
-                else 
-                {
-                    jumpHeight = 0;
-                    jumping = false;
-                    jumpingSpeed = 5;
-                }
+                currentAnimation = jumpAnimation;
+            }
+            else if (Math.Abs(velocity.X) > 0)
+            {
+                currentAnimation = runAnimation;
             }
             else
             {
-                speed = 4.05f;
+                currentAnimation = idleAnimation;
             }
+
+            currentAnimation.Update(gameTime);
         }
 
-        public void DrawPlayer(SpriteBatch _spriteBatch)
+        public void Draw(GameTime gameTime)
         {
-            SpriteEffects spriteEffects = isFacingRight ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
+            if (spriteBatch == null) throw new InvalidOperationException("SpriteBatch has not been initialized.");
 
-            //Vector2 scale = new Vector2(20f, 20f);
-
-            _spriteBatch.Draw(
-                texture: this.CurrentAnimation.Texture,
-                position: new Vector2(
-                    this.Position.X,
-                    this.Position.Y),
-                sourceRectangle: this.CurrentAnimation.CurrentFrameSourceRectangle(),
-                color: Microsoft.Xna.Framework.Color.White,
-                rotation: 0f,
-                origin: new Vector2(
-                    this.CurrentAnimation.FrameWidth / 2,
-                    this.CurrentAnimation.FrameHeight / 2),
-                scale: Vector2.One,
-                effects: spriteEffects,
-                layerDepth: 0f
-            );
+            spriteBatch.Draw(texture, position, currentAnimation.CurrentFrameSourceRectangle(), Color.White, 0f, Vector2.Zero, 1f, isFacingRight ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0f);
         }
-
-
-        // Get/Set
-
-        public bool IsOnBlock
-        {
-            get { return isOnBlock; }
-            set { isOnBlock = value; }
-        }
-        public float Speed
-        {
-            get { return speed; }
-            set { speed = value; }
-        }
-        public bool Jumping
-        {
-            get { return this.jumping; }
-            set { this.jumping = value; }
-        }
-        public bool IsFacingRight
-        {
-            get { return isFacingRight; }
-            set { isFacingRight = value; }
-        }
-        public RectangleF PositionNew
-        {
-            get { return positionNew; }
-            set { positionNew = value; }
-        }
-        public RectangleF Position
-        {
-            get { return position; }
-            set
-            {
-                position.X = value.X;
-                position.Y = value.Y;
-                position.Width = value.Width;
-                position.Height = value.Height;
-            }
-        }
-        public Texture2D Texture
-        {
-            get { return texture; }
-            set { texture = value; }
-        }
-        public Animation CurrentAnimation
-        {
-            get { return currentAnimation; }
-            set { currentAnimation = value; }
-        }
-
-        public Animation IdleAnimation
-        {
-            get { return idleAnimation; }
-            set { idleAnimation = value; }
-        }
-
-        public Animation RunAnimation
-        {
-            get { return runAnimation; }
-            set { runAnimation = value; }
-        }
-
     }
 }
