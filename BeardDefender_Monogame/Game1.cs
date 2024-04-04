@@ -161,7 +161,7 @@ namespace BeardDefender_Monogame
                 case Scenes.MAIN_MENU:
 
                     KeyboardState state = Keyboard.GetState();
-
+                    mainmenu.Update(gameTime);
 
                     bool upDownPressed = state.IsKeyDown(Keys.Up) || state.IsKeyDown(Keys.Down);
                     if (upDownPressed && !previousUpPressed && !previousDownPressed)
