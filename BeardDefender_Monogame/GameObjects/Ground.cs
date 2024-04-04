@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System.Drawing;
-using System.Text.RegularExpressions;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace BeardDefender_Monogame.GameObjects
@@ -11,21 +10,35 @@ namespace BeardDefender_Monogame.GameObjects
     {
         Texture2D texture;
         RectangleF position;
+        int posX;
 
         public Ground(RectangleF position) 
         {
             this.position = position;
+            this.posX = (int)position.X;
         }
 
         public void LoadContent (ContentManager Content)
         {
             this.texture = Content.Load<Texture2D>("ground 10tiles");
         }
+        public void Update (GameTime gameTime, int screenWidth)
+        {
+            // Update position to scroll backgrounds
+            this.posX -= 1; // Adjust the scrolling speed as needed
+
+            // Check if the backgrounds have scrolled beyond the screen width
+            if (this.posX <= -screenWidth)
+            {
+                // Reset the position to the right side of the screen
+                this.posX = 1320;
+            }
+        }
         public void Draw (SpriteBatch _spriteBatch) 
         {
             _spriteBatch.Draw(
                 this.texture,
-                new Vector2 (this.position.X, this.position.Y),
+                new Vector2 (this.posX, this.position.Y),
                 Color.White);
         }
 

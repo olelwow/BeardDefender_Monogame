@@ -5,12 +5,11 @@ using Microsoft.Xna.Framework;
 
 namespace BeardDefender_Monogame
 {
-    internal class Highscore : Background
+    internal class Highscore //: Background
     {    
         //Olika layers för att skapa bakgrunden i spelet.
         private Texture2D highscorebackground;
        
-
         public void LoadContent(ContentManager Content)
         {
             //Hämtar in respektive bild i variabler.
