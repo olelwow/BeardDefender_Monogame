@@ -23,6 +23,9 @@ namespace BeardDefender_Monogame.GameObjects
 
         public void LoadContent(ContentManager Content)
         {
+
+            //Hämtar in respektive bild i variabler.
+
             this.Background1 = Content.Load<Texture2D>("Bakgrund1");
             this.Background2 = Content.Load<Texture2D>("Bakgrund2");
             this.Background3 = Content.Load<Texture2D>("Bakgrund3");
@@ -41,12 +44,17 @@ namespace BeardDefender_Monogame.GameObjects
                 this.posX -= scrollSpeedAdjustment;
             }
 
-            // Check if the backgrounds have scrolled beyond the screen width
+
+            this.posX -= 1; // Justera tiden för scroll-hastigheten
+
+            // Kollar ifall bakgrunden har scrollat förbi skärmens bredd.
             if (this.posX <= -screenWidth)
             {
+
                 // Reset the position to the right side of the screen
                 this.posX = screenWidth; 
             }
+
         }
 
         public void DrawBackground(SpriteBatch _spriteBatch, int MapWidth, int MapHeight)
