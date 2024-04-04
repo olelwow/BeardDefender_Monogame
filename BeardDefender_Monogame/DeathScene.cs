@@ -1,47 +1,47 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
+﻿using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Color = Microsoft.Xna.Framework.Color;
 
-namespace BeardDefender_Monogame.GameObjects
+namespace BeardDefender_Monogame
 {
-    internal class Crabman : Enemy
+    internal class DeathScene
     {
-        RectangleF position = new RectangleF();
+        //Olika layers för att skapa bakgrunden i spelet.
+        private Texture2D deathSceneBackground;
         private Texture2D currentTexture;
-        private Texture2D[] textureArray; // Innehåller texturer för rörelse till höger.
+        private Texture2D[] textureArray;
         float frameDuration = 0.2f; // Hastighet på animationen.
         float frameTimer = 0f;
         int currentFrameIndex; // Variabel som väljer vilken frame man tar ur arrayen.
-        private int positionX = 40;
-        private int positionY = 586;
+        private int positionX = 1320/2;
+        private int positionY = 720/2;
 
-        public Crabman()
+
+        public DeathScene() 
         {
-            // Array MÅSTE intieras innan man försöker lägga in textures i den.
-            this.textureArray = new Texture2D[3];
-
+            this.textureArray = new Texture2D[4];
         }
-
-
 
         public void LoadContent(ContentManager Content)
         {
-            this.TextureArray[0] = Content.Load<Texture2D>("Crabman1");
-            this.TextureArray[1] = Content.Load<Texture2D>("Crabman2");
-            this.TextureArray[2] = Content.Load<Texture2D>("Crabman3");
+            //Hämtar in respektive bild i variabler.
+
+            //this.deathSceneBackground = Content.Load<Texture2D>("highscore_screen");
+            this.TextureArray[0] = Content.Load<Texture2D>("CrabmandDeath1");
+            this.TextureArray[1] = Content.Load<Texture2D>("CrabmandDeath2");
+            this.TextureArray[2] = Content.Load<Texture2D>("CrabmandDeath3");
+            this.TextureArray[3] = Content.Load<Texture2D>("CrabmandDeath4");
             this.CurrentTexture = this.TextureArray[0];
+
         }
 
-        public override int Update(GraphicsDeviceManager _graphics, GameTime gameTime)
+        public int Update(GraphicsDeviceManager _graphics, GameTime gameTime)
         {
-            // Uppdatera frameTimer
             frameTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (frameTimer >= frameDuration)
             {
@@ -54,9 +54,17 @@ namespace BeardDefender_Monogame.GameObjects
             return currentFrameIndex;
         }
 
-        public override void Draw(SpriteBatch spriteBatch)
+        public void DrawBackground(SpriteBatch _spriteBatch, int MapWidth, int MapHeight)
         {
-            spriteBatch.Draw(
+            //Skapar en rektangel i storlek med spelrutan och förstorar bakgrundsbilderna-
+            //till samma storlek som spelytan.
+            Vector2 desiredSize = new Vector2(MapWidth, MapHeight);
+            Rectangle destinationRectangle = new Rectangle(0, 0, (int)desiredSize.X, (int)desiredSize.Y);
+            //Vector2 scale = new Vector2(20f, 20f);
+
+            //_spriteBatch.Draw(deathSceneBackground, destinationRectangle, Color.White);
+
+            _spriteBatch.Draw(
                     this.textureArray[currentFrameIndex],
                     new Vector2(
                         positionX, //position.X
@@ -71,7 +79,13 @@ namespace BeardDefender_Monogame.GameObjects
                     Vector2.One,
                     SpriteEffects.None,
                     0f);
+
+
+
         }
+
+        // Get/Set
+       
 
         public Texture2D[] TextureArray
         {
@@ -104,5 +118,5 @@ namespace BeardDefender_Monogame.GameObjects
         }
 
     }
-
 }
+
