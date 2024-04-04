@@ -12,10 +12,7 @@ namespace BeardDefender_Monogame.GameObjects
     internal class MainMenu
     {
         //Olika layers för att skapa bakgrunden i spelet.
-        private Texture2D background1;
-        //private Texture2D background2;
-        //private Texture2D background3;
-        //private Texture2D background4;
+        private Texture2D background1;        
         private List<Texture2D> _backgroundImages = new List<Texture2D>();
         private int _currentImageIndex = 1;
         private double _timer = 0;
@@ -25,11 +22,7 @@ namespace BeardDefender_Monogame.GameObjects
 
         public void LoadContent(ContentManager Content)
         {
-            //Hämtar in respektive bild i variabler.
-            //this.Background1 = Content.Load<Texture2D>("BeardDefender_MainMenu");
-            //this.Background2 = Content.Load<Texture2D>("Bakgrund2");
-            //this.Background3 = Content.Load<Texture2D>("Bakgrund3");
-            //this.Background4 = Content.Load<Texture2D>("Bakgrund4");
+            //Hämtar in respektive bild i variabler.            
             for (int i = 1; i <= 100; i++)
             {
                 _backgroundImages.Add(Content.Load<Texture2D>("MainMenuBackground/BeardDefender" + i.ToString()));
@@ -38,10 +31,10 @@ namespace BeardDefender_Monogame.GameObjects
 
         public void Update(GameTime gameTime)
         {
-            // Update the timer
+            // Uppdatera timern
             _timer += gameTime.ElapsedGameTime.TotalMilliseconds;
-
-            // If the timer exceeds the interval, change the background image
+            
+            // Om timern överskrider intervallen så ändras bakgrunden
             if (_timer > _interval)
             {
                 _currentImageIndex = (_currentImageIndex + 1) % _backgroundImages.Count;
@@ -59,13 +52,7 @@ namespace BeardDefender_Monogame.GameObjects
             Vector2 desiredSize = new Vector2(MapWidth, MapHeight);
             Rectangle destinationRectangle = new Rectangle(0, 0, (int)desiredSize.X, (int)desiredSize.Y);
 
-            //Vector2 scale = new Vector2(20f, 20f);
-
-            //_spriteBatch.Draw(Background1, destinationRectangle, Color.White);
-
-            //_spriteBatch.Draw(Background2, destinationRectangle, Color.White);
-            //_spriteBatch.Draw(Background3, destinationRectangle, Color.White);
-            //_spriteBatch.Draw(Background4, destinationRectangle, Color.White);
+            
             _spriteBatch.Draw(_backgroundImages[_currentImageIndex], destinationRectangle, Color.White);
         }
 
@@ -78,23 +65,5 @@ namespace BeardDefender_Monogame.GameObjects
             get { return background1; }
             set { background1 = value; }
         }
-
-        //public Texture2D Background2
-        //{
-        //    get { return background2; }
-        //    set { background2 = value; }
-        //}
-
-        //public Texture2D Background3
-        //{
-        //    get { return background3; }
-        //    set { background3 = value; }
-        //}
-
-        //public Texture2D Background4
-        //{
-        //    get { return background4; }
-        //    set { background4 = value; }
-        //}
     }
 }

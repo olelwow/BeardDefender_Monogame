@@ -50,6 +50,7 @@ namespace BeardDefender_Monogame
         // Unit objects
         Shark shark;
         Hedgehog hedgehog;
+        Crabman crabman;
 
         //Player object
         Player player;
@@ -87,6 +88,7 @@ namespace BeardDefender_Monogame
             background = new Background(0);
             background2 = new Background(1320);
             shark = new(new Vector2(100, 100));
+            crabman = new Crabman();
 
             player = new Player(new RectangleF(100, 400, 25, 36));
 
@@ -155,6 +157,9 @@ namespace BeardDefender_Monogame
 
             // Laddar texturer och animationer för Player.
             player.LoadContent(Content);
+
+            //Texturer för crabman
+            crabman.LoadContent(Content);
 
             // Texturer för shark
             shark.LoadContent(Content);
@@ -232,6 +237,8 @@ namespace BeardDefender_Monogame
             {
                 ground.Update(gameTime, GraphicsDevice.Viewport.Width);
             }
+
+            crabman.CurrentFrameIndex = crabman.Update(_graphics, gameTime);
             // Shark movement, returnerar rätt frame index som används i Update.
             shark.CurrentFrameIndex = shark.Update(_graphics, gameTime);
             // Hedgehog movement.
@@ -284,6 +291,7 @@ namespace BeardDefender_Monogame
                     player.DrawPlayer(_spriteBatch);
 
                     // SHAAAARKs draw metod sköter animationer beroende på åt vilket håll hajen rör sig.
+                    crabman.Draw(_spriteBatch);
                     shark.Draw(_spriteBatch);
                     hedgehog.Draw(_spriteBatch);
 

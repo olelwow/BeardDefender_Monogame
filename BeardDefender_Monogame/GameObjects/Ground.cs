@@ -24,13 +24,14 @@ namespace BeardDefender_Monogame.GameObjects
         }
         public void Update (GameTime gameTime, int screenWidth)
         {
-            // Update position to scroll backgrounds
-            this.posX -= 1; // Adjust the scrolling speed as needed
-
-            // Check if the backgrounds have scrolled beyond the screen width
+                    
+            this.posX -= 1; // Justera tiden för scroll-hastigheten
+           
+            // Kollar ifall bakgrunden har scrollat förbi skärmens bredd.
             if (this.posX <= -screenWidth)
             {
-                // Reset the position to the right side of the screen
+                
+                // Nollställer positionen till höger sida om skärmen
                 this.posX = 1320;
             }
         }

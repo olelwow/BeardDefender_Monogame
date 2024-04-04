@@ -86,6 +86,7 @@ namespace BeardDefender_Monogame.GameObjects
             else
             {
                 currentAnimation = idleAnimation;
+                this.position.X -= 1;
             }
             return isFacingRight;
         }

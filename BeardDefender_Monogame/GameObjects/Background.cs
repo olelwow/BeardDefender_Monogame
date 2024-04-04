@@ -20,31 +20,33 @@ namespace BeardDefender_Monogame.GameObjects
         private int posY;
 
 
-        public Background (int startX)
+        public Background(int startX)
         {
             this.posX = startX;
         }
 
-    public void LoadContent(ContentManager Content)
-    {
+        public void LoadContent(ContentManager Content)
+        {
             //Hämtar in respektive bild i variabler.
-        this.Background1 = Content.Load<Texture2D>("Bakgrund1");
-        this.Background2 = Content.Load<Texture2D>("Bakgrund2");
-        this.Background3 = Content.Load<Texture2D>("Bakgrund3");
-        this.Background4 = Content.Load<Texture2D>("Bakgrund4");
-    }
+            this.Background1 = Content.Load<Texture2D>("Bakgrund1");
+            this.Background2 = Content.Load<Texture2D>("Bakgrund2");
+            this.Background3 = Content.Load<Texture2D>("Bakgrund3");
+            this.Background4 = Content.Load<Texture2D>("Bakgrund4");
+        }
 
         public void Update(GameTime gameTime, int screenWidth)
         {
-            // Update position to scroll backgrounds
-            this.posX -= 1; // Adjust the scrolling speed as needed
 
-            // Check if the backgrounds have scrolled beyond the screen width
+            this.posX -= 1; // Justera tiden för scroll-hastigheten
+
+            // Kollar ifall bakgrunden har scrollat förbi skärmens bredd.
             if (this.posX <= -screenWidth)
             {
-                // Reset the position to the right side of the screen
+
+                // Nollställer positionen till höger sida om skärmen
                 this.posX = 1320;
             }
+
         }
 
         public void DrawBackground(SpriteBatch _spriteBatch, int MapWidth, int MapHeight)
@@ -54,12 +56,12 @@ namespace BeardDefender_Monogame.GameObjects
             Vector2 desiredSize = new Vector2(MapWidth, MapHeight);
             Rectangle destinationRectangle = new Rectangle(posX, posY, (int)desiredSize.X, (int)desiredSize.Y);
             //Vector2 scale = new Vector2(20f, 20f);
-            
+
             _spriteBatch.Draw(Background1, destinationRectangle, Color.White);
             _spriteBatch.Draw(Background2, destinationRectangle, Color.White);
             _spriteBatch.Draw(Background3, destinationRectangle, Color.White);
             _spriteBatch.Draw(Background4, destinationRectangle, Color.White);
-            
+
         }
 
 
