@@ -13,6 +13,7 @@ namespace BeardDefender_Monogame
     {
         MAIN_MENU,
         GAME,
+        DEATH,
         HIGHSCORE
     };
     public class Game1 : Game
@@ -42,6 +43,9 @@ namespace BeardDefender_Monogame
 
         //Highscore object
         Highscore highscore;
+
+        //Deathscene object
+        DeathScene deathScene;
 
         //Background object
         Background background;
@@ -90,6 +94,7 @@ namespace BeardDefender_Monogame
 
             // Unit objects
             mainmenu = new MainMenu();
+            deathScene = new DeathScene();
             highscore = new Highscore();
             background = new Background(0);
             background2 = new Background(1320);
@@ -97,7 +102,7 @@ namespace BeardDefender_Monogame
             crabman = new Crabman();
 
             ScoreBoxPosition = new Vector2(0, 15);
-            player = new Player(new RectangleF(100, 400, 25, 36));
+            player = new Player(new RectangleF(500, 400, 25, 36));
 
             // Obstacle/Ground. Kunde inte använda texturens Height/Width värden här,
             // 80 representerar Height, width är 640. Får klura ut hur man skulle kunna göra annars.
@@ -159,6 +164,9 @@ namespace BeardDefender_Monogame
             background.LoadContent(Content);
             background2.LoadContent(Content);
 
+            //Laddar texturer för deathscene
+            deathScene.LoadContent(Content);
+
             //Laddar texturer för scorebox
             ScoreBox = Content.Load<Texture2D>("ScoreBox");
             ScoreFont = Content.Load<SpriteFont>("ScoreFont");
@@ -203,10 +211,12 @@ namespace BeardDefender_Monogame
                         if (startGameSelected)
                         {
                             activeScenes = Scenes.GAME;
+                                                        
                         }
                         else if (highscoreSelected) // Justerad villkor för att korrekt hantera menyval
                         {
-                            activeScenes = Scenes.HIGHSCORE;
+                           // activeScenes = Scenes.HIGHSCORE;
+                            activeScenes = Scenes.DEATH;
                         }
                         else if (exitGameSelected)
                         {
@@ -227,6 +237,10 @@ namespace BeardDefender_Monogame
                     }
                     else
                     {
+                        if (player.position.X == crabman.PositionX)
+                        {
+                            activeScenes = Scenes.DEATH;
+                        }
                         // Kontrollera spelarens rörelse för att uppdatera bakgrunden
                         bool isPlayerMoving = keyboardState.IsKeyDown(Keys.Left) || keyboardState.IsKeyDown(Keys.Right);
                         int playerSpeed = 5; 
@@ -243,6 +257,29 @@ namespace BeardDefender_Monogame
                         shark.CurrentFrameIndex = shark.Update(_graphics, gameTime);
                         hedgehog.Update(gameTime, new Vector2(player.position.X, player.position.Y));
                         player.IsFacingRight = player.MovePlayer(keyboardState, hedgehog, groundList);
+
+                        //returnerar rätt frame index som används i Update.
+                        //returnerar rätt frame index som används i Update.
+                        crabman.CurrentFrameIndex = crabman.Update(_graphics, gameTime);
+                        // Shark movement, returnerar rätt frame index som används i Update.
+                        shark.CurrentFrameIndex = shark.Update(_graphics, gameTime);
+                        // Hedgehog movement.
+                        hedgehog.Update(gameTime, new Vector2(player.position.X, player.position.Y));
+
+                        //Updaterar score i sammaband med spelets timer
+                        score += (double)gameTime.ElapsedGameTime.TotalSeconds;
+
+                        // Player movement, sätter players variabel IsFacingRight till returvärdet av
+                        // metoden, som håller koll på vilket håll spelaren är riktad åt.
+                        player.IsFacingRight =
+                            player.MovePlayer(
+                                keyboardState,
+                                hedgehog,
+                                groundList);
+
+                        
+                        player.CurrentAnimation.Update(gameTime);
+
                         player.CurrentAnimation.Update(gameTime);
                     }
                     break;
@@ -253,27 +290,13 @@ namespace BeardDefender_Monogame
                         activeScenes = Scenes.MAIN_MENU;
                     }
                     break;
+
+                
             }
 
-
-            crabman.CurrentFrameIndex = crabman.Update(_graphics, gameTime);
-            // Shark movement, returnerar rätt frame index som används i Update.
-            shark.CurrentFrameIndex = shark.Update(_graphics, gameTime);
-            // Hedgehog movement.
-            hedgehog.Update(gameTime, new Vector2(player.position.X, player.position.Y));
-
-            //Updaterar score i sammaband med spelets timer
-            score += (double)gameTime.ElapsedGameTime.TotalSeconds;
-
-            // Player movement, sätter players variabel IsFacingRight till returvärdet av
-            // metoden, som håller koll på vilket håll spelaren är riktad åt.
-            player.IsFacingRight =
-                player.MovePlayer(
-                    keyboardState,
-                    hedgehog,
-                    groundList);
-
-            player.CurrentAnimation.Update(gameTime);
+            //Flytta in i deathscene när vi har fixat kollision med fiende.
+                        deathScene.CurrentFrameIndex = deathScene.Update(_graphics, gameTime);
+            
 
 
             base.Update(gameTime);
@@ -332,8 +355,10 @@ namespace BeardDefender_Monogame
                     
                     break;
 
-                case Scenes.HIGHSCORE:
-                    highscore.DrawBackground(_spriteBatch, MapWidth, MapHeight);
+                case Scenes.DEATH:
+                    //Testar bara men ska vara highscore scene här sen.
+                    //highscore.DrawBackground(_spriteBatch, MapWidth, MapHeight);
+                    deathScene.DrawBackground(_spriteBatch, MapWidth, MapHeight);
                     break;
             }
 
