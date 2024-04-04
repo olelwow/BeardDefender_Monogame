@@ -167,14 +167,14 @@ namespace BeardDefender_Monogame
 
         protected override void Update(GameTime gameTime)
         {
+            KeyboardState keyboardState = Keyboard.GetState();
+
             switch (activeScenes)
             {
                 case Scenes.MAIN_MENU:
-
-                    KeyboardState state = Keyboard.GetState();
                     mainmenu.Update(gameTime);
 
-                    bool upDownPressed = state.IsKeyDown(Keys.Up) || state.IsKeyDown(Keys.Down);
+                    bool upDownPressed = keyboardState.IsKeyDown(Keys.Up) || keyboardState.IsKeyDown(Keys.Down);
                     if (upDownPressed && !previousUpPressed && !previousDownPressed)
                     {
                         startGameSelected = !startGameSelected;
@@ -182,13 +182,13 @@ namespace BeardDefender_Monogame
                         exitGameSelected = !exitGameSelected;
                     }
 
-                    if (state.IsKeyDown(Keys.Enter) && !previousEnterPressed)
+                    if (keyboardState.IsKeyDown(Keys.Enter) && !previousEnterPressed)
                     {
                         if (startGameSelected)
                         {
                             activeScenes = Scenes.GAME;
                         }
-                        else if(state.IsKeyDown(Keys.Enter) && !previousEnterPressed )
+                        else if (highscoreSelected) // Justerad villkor för att korrekt hantera menyval
                         {
                             activeScenes = Scenes.HIGHSCORE;
                         }
@@ -198,57 +198,50 @@ namespace BeardDefender_Monogame
                         }
                     }
 
-                    previousUpPressed = state.IsKeyDown(Keys.Up);
-                    previousDownPressed = state.IsKeyDown(Keys.Down);
-                    previousEnterPressed = state.IsKeyDown(Keys.Enter);
-
-
+                    previousUpPressed = keyboardState.IsKeyDown(Keys.Up);
+                    previousDownPressed = keyboardState.IsKeyDown(Keys.Down);
+                    previousEnterPressed = keyboardState.IsKeyDown(Keys.Enter);
                     break;
 
                 case Scenes.GAME:
-                    if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+                    // Kontrollera om spelaren försöker gå tillbaka till huvudmenyn
+                    if (keyboardState.IsKeyDown(Keys.Escape))
                     {
                         activeScenes = Scenes.MAIN_MENU;
                     }
+                    else
+                    {
+                        // Kontrollera spelarens rörelse för att uppdatera bakgrunden
+                        bool isPlayerMoving = keyboardState.IsKeyDown(Keys.Left) || keyboardState.IsKeyDown(Keys.Right);
+                        int playerSpeed = 5; 
 
+                        background.Update(gameTime, GraphicsDevice.Viewport.Width, isPlayerMoving, playerSpeed);
+                        background2.Update(gameTime, GraphicsDevice.Viewport.Width, isPlayerMoving, playerSpeed);
+
+                        // Uppdatera spelarposition, fiender, osv.
+                        player.position.Y = groundLower.Position.Y - (player.Texture.Height / 4);
+                        foreach (Ground ground in groundList)
+                        {
+                            ground.Update(gameTime, GraphicsDevice.Viewport.Width);
+                        }
+                        shark.CurrentFrameIndex = shark.Update(_graphics, gameTime);
+                        hedgehog.Update(gameTime, new Vector2(player.position.X, player.position.Y));
+                        player.IsFacingRight = player.MovePlayer(keyboardState, hedgehog, groundList);
+                        player.CurrentAnimation.Update(gameTime);
+                    }
                     break;
 
-                    case Scenes.HIGHSCORE:
-                    if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+                case Scenes.HIGHSCORE:
+                    if (keyboardState.IsKeyDown(Keys.Escape))
                     {
                         activeScenes = Scenes.MAIN_MENU;
                     }
                     break;
-
             }
-
-            KeyboardState keyboardState = Keyboard.GetState();
-
-            // Player pos Y för att stå på marken.
-            player.position.Y = groundLower.Position.Y - (player.Texture.Height / 4);
-            background.Update(gameTime, GraphicsDevice.Viewport.Width);
-            background2.Update(gameTime, GraphicsDevice.Viewport.Width);
-            foreach (Ground ground in groundList)
-            {
-                ground.Update(gameTime, GraphicsDevice.Viewport.Width);
-            }
-            // Shark movement, returnerar rätt frame index som används i Update.
-            shark.CurrentFrameIndex = shark.Update(_graphics, gameTime);
-            // Hedgehog movement.
-            hedgehog.Update(gameTime, new Vector2(player.position.X, player.position.Y));
-
-            // Player movement, sätter players variabel IsFacingRight till returvärdet av
-            // metoden, som håller koll på vilket håll spelaren är riktad åt.
-            player.IsFacingRight =
-                player.MovePlayer(
-                    keyboardState,
-                    hedgehog,
-                    groundList);
-
-            player.CurrentAnimation.Update(gameTime);
 
             base.Update(gameTime);
         }
+
 
         protected override void Draw(GameTime gameTime)
         {
