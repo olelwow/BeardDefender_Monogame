@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Drawing;
 using Color = Microsoft.Xna.Framework.Color;
+using BeardDefender_Monogame.GameObjects.Powerups;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace BeardDefender_Monogame
 {
@@ -35,7 +37,9 @@ namespace BeardDefender_Monogame
         private bool previousDownPressed = false;
         private bool previousEnterPressed = false;
 
-
+        // Powerups
+        Heart heart;
+        JumpBoost jumpBoost;
 
         // MainMenu object
         MainMenu mainmenu;
@@ -100,6 +104,10 @@ namespace BeardDefender_Monogame
             background2 = new Background(1320);
             shark = new(new Vector2(100, 100));
             crabman = new Crabman();
+
+            // Powerups
+            heart = new Heart(new Rectangle(900, 600, 60, 60));
+            jumpBoost = new JumpBoost(new Rectangle(700, 600, 60, 60));
 
             ScoreBoxPosition = new Vector2(0, 15);
             player = new Player(new RectangleF(500, 400, 25, 36));
@@ -187,6 +195,9 @@ namespace BeardDefender_Monogame
             {
                 ground.LoadContent(Content);
             }
+            // Powerupzzz
+            heart.LoadContent(Content);
+            jumpBoost.LoadContent(Content);
         }
 
         protected override void Update(GameTime gameTime)
@@ -281,6 +292,13 @@ namespace BeardDefender_Monogame
                         player.CurrentAnimation.Update(gameTime);
 
                         player.CurrentAnimation.Update(gameTime);
+                        crabman.CurrentFrameIndex = crabman.Update(_graphics, gameTime);
+
+                        //Updaterar score i sammaband med spelets timer
+                        score += (double)gameTime.ElapsedGameTime.TotalSeconds;
+                        // Powerups
+                        heart.Update(gameTime, player);
+                        jumpBoost.Update(gameTime, player); 
                     }
                     break;
 
@@ -291,12 +309,33 @@ namespace BeardDefender_Monogame
                     }
                     break;
 
+
                 
             }
 
             //Flytta in i deathscene när vi har fixat kollision med fiende.
                         deathScene.CurrentFrameIndex = deathScene.Update(_graphics, gameTime);
             
+
+            //crabman.CurrentFrameIndex = crabman.Update(_graphics, gameTime);
+            //// Shark movement, returnerar rätt frame index som används i Update.
+            //shark.CurrentFrameIndex = shark.Update(_graphics, gameTime);
+            //// Hedgehog movement.
+            //hedgehog.Update(gameTime, new Vector2(player.position.X, player.position.Y));
+
+            ////Updaterar score i sammaband med spelets timer
+            //score += (double)gameTime.ElapsedGameTime.TotalSeconds;
+
+            //// Player movement, sätter players variabel IsFacingRight till returvärdet av
+            //// metoden, som håller koll på vilket håll spelaren är riktad åt.
+            //player.IsFacingRight =
+            //    player.MovePlayer(
+            //        keyboardState,
+            //        hedgehog,
+            //        groundList);
+
+            //player.CurrentAnimation.Update(gameTime);
+
 
 
             base.Update(gameTime);
@@ -352,7 +391,14 @@ namespace BeardDefender_Monogame
                     {
                         item.Draw(_spriteBatch);
                     }
-                    
+                    if (!heart.Taken)
+                    {
+                        heart.Draw(_spriteBatch);
+                    }
+                    if (!jumpBoost.Taken)
+                    {
+                        jumpBoost.Draw(_spriteBatch);
+                    }
                     break;
 
                 case Scenes.DEATH:

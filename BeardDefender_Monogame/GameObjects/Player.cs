@@ -24,6 +24,7 @@ namespace BeardDefender_Monogame.GameObjects
         private Animation currentAnimation;
         private Animation idleAnimation;
         private Animation runAnimation;
+        private int hP;
 
         public Player(RectangleF position)
         {
@@ -139,7 +140,11 @@ namespace BeardDefender_Monogame.GameObjects
 
 
         // Get/Set
-
+        public int HP
+        {
+            get { return hP; }
+            set { hP = value; } 
+        }
         public bool IsOnBlock
         {
             get { return isOnBlock; }
