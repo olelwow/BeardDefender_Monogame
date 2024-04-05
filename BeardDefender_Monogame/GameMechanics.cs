@@ -1,9 +1,12 @@
 ﻿using BeardDefender_Monogame.GameObjects;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Numerics;
 using System.Text.RegularExpressions;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace BeardDefender_Monogame
 {
@@ -16,6 +19,12 @@ namespace BeardDefender_Monogame
             {
                 Environment.Exit(0);
             }
+        }
+
+        public static Rectangle ConvertRectangleFToRectangle (RectangleF rect)
+        {
+            Rectangle rectangle = new((int)rect.X, (int)rect.Y, (int)rect.Width, (int)rect.Height);
+            return rectangle;
         }
 
         public static void ApplyGravity(List<Ground> groundList, Player player, Hedgehog hedgehog)
