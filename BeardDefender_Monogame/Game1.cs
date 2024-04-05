@@ -8,8 +8,13 @@ using System.Drawing;
 using Color = Microsoft.Xna.Framework.Color;
 using BeardDefender_Monogame.GameObjects.Powerups;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
+using Microsoft.Xna.Framework.Media;
+using Microsoft.Xna.Framework.Content;
+using System.ComponentModel;
+using Microsoft.Xna.Framework.Audio;
 using System;
 using System.IO;
+
 
 namespace BeardDefender_Monogame
 {
@@ -55,6 +60,8 @@ namespace BeardDefender_Monogame
         private bool previousUpPressed = false;
         private bool previousDownPressed = false;
         private bool previousEnterPressed = false;
+        //Musik
+        Song backgroundMusic;
 
         // Powerups
         Heart heart;
@@ -199,6 +206,12 @@ namespace BeardDefender_Monogame
 
         protected override void LoadContent()
         {
+            //Laddar musikfilen
+            ContentManager content = new ContentManager(this.Services, "Content");
+            backgroundMusic = content.Load<Song>("BitGame");
+            MediaPlayer.Volume = 0.3f;
+
+
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             buttonFont = Content.Load<SpriteFont>("Font");
 
@@ -250,11 +263,18 @@ namespace BeardDefender_Monogame
 
         protected override void Update(GameTime gameTime)
         {
+
+            if ( MediaPlayer.State != MediaState.Playing )
+            {
+                MediaPlayer.Play(backgroundMusic);
+            }
+
             KeyboardState keyboardState = Keyboard.GetState();
 
             switch (activeScenes)
             {
                 case Scenes.MAIN_MENU:
+
                     mainmenu.Update(gameTime);
                     // Loopa genom menyvalen
                     if (keyboardState.IsKeyDown(Keys.Down) && !previousDownPressed)
@@ -274,7 +294,9 @@ namespace BeardDefender_Monogame
                                 activeScenes = lastPlayedLevel;
                                 break;
                             case MenuOption.SCORE:
+                          
                                 activeScenes = Scenes.HIGHSCORE;
+
                                 break;
                             case MenuOption.EXIT:
                                 Exit();

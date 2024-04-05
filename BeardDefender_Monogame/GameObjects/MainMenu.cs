@@ -41,8 +41,6 @@ namespace BeardDefender_Monogame.GameObjects
                 _timer = 0;
             }
 
-
-
         }
 
         public void DrawMainMenu(SpriteBatch _spriteBatch, int MapWidth, int MapHeight)
