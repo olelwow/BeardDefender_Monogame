@@ -8,6 +8,8 @@ using System.Drawing;
 using Color = Microsoft.Xna.Framework.Color;
 using BeardDefender_Monogame.GameObjects.Powerups;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
+using System;
+using System.IO;
 
 namespace BeardDefender_Monogame
 {
@@ -42,6 +44,8 @@ namespace BeardDefender_Monogame
         private SpriteBatch _spriteBatch;
         const int MapWidth = 1320;
         const int MapHeight = 720;
+        private static readonly string DesktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+        private static string filePath = Path.Combine(DesktopPath, "Game HighScore.txt");
 
         bool startGameSelected = true; // Starta spelet är förvalt
         bool exitGameSelected = false;
@@ -94,6 +98,10 @@ namespace BeardDefender_Monogame
         Texture2D ScoreBox;
         Vector2 ScoreBoxPosition;
         SpriteFont ScoreFont;
+
+        //Username input
+        TextBox TextBox;
+        public string username = "";
 
 
         public Game1()
@@ -198,6 +206,9 @@ namespace BeardDefender_Monogame
             ScoreBox = Content.Load<Texture2D>("ScoreBox");
             ScoreFont = Content.Load<SpriteFont>("ScoreFont");
 
+            //Laddar texture för username textbox
+            TextBox = new TextBox(ScoreFont);
+
             //laddar texturer för Highscore
             highscore.LoadContent(Content);
 
@@ -245,6 +256,7 @@ namespace BeardDefender_Monogame
                         switch (currentMenuOption)
                         {
                             case MenuOption.PLAY:
+                                
                                 activeScenes = lastPlayedLevel;
                                 break;
                             case MenuOption.SCORE:
@@ -278,6 +290,8 @@ namespace BeardDefender_Monogame
                         if (player.position.X == crabman.PositionX)
                         {
                             activeScenes = Scenes.DEATH;
+                            TextBox.Update();
+                            File.AppendAllText(filePath, $"\nScore: {((int)Math.Ceiling(score)).ToString()}");
                         }
 
                         if (levelTimer >= LevelTimeLimit)
@@ -309,9 +323,6 @@ namespace BeardDefender_Monogame
                         // Shark movement, returnerar rätt frame index som används i Update.
                         shark.CurrentFrameIndex = shark.Update(_graphics, gameTime);
 
-                        // Hedgehog movement.
-                        hedgehog.Update(gameTime, new Vector2(player.position.X, player.position.Y));
-
                         //Updaterar score i sammaband med spelets timer
                         score += (double)gameTime.ElapsedGameTime.TotalSeconds;
 
@@ -326,9 +337,6 @@ namespace BeardDefender_Monogame
                         player.CurrentAnimation.Update(gameTime);
                         crabman.CurrentFrameIndex = crabman.Update(_graphics, gameTime);
 
-                        //Updaterar score i sammaband med spelets timer
-                        score += (double)gameTime.ElapsedGameTime.TotalSeconds;
-
                         // Powerups
                         heart.Update(gameTime, player);
                         jumpBoost.Update(gameTime, player);
@@ -340,6 +348,7 @@ namespace BeardDefender_Monogame
                     // Kontrollera om spelaren försöker gå tillbaka till huvudmenyn
                     if (keyboardState.IsKeyDown(Keys.Escape))
                     {
+                        File.AppendAllText(filePath, $"\nScore: {((int)Math.Ceiling(score)).ToString()}");
                         lastPlayedLevel = activeScenes;
                         activeScenes = Scenes.MAIN_MENU;
                     }
@@ -350,11 +359,15 @@ namespace BeardDefender_Monogame
                         if (player.position.X == crabman.PositionX)
                         {
                             activeScenes = Scenes.DEATH;
+                            TextBox.Update();
+                            File.AppendAllText(filePath, $"\nScore: {((int)Math.Ceiling(score)).ToString()}");
                         }
 
                         if (levelTimer >= LevelTimeLimit)
                         {
                             activeScenes = Scenes.WIN;
+                            TextBox.Update();
+                            File.AppendAllText(filePath, $"\n{username}: {((int)Math.Ceiling(score)).ToString()}");
                             levelTimer = 0;
                         }
 
@@ -388,7 +401,7 @@ namespace BeardDefender_Monogame
                         //hedgehog.Update(gameTime, new Vector2(player.position.X, player.position.Y));
 
                         //Updaterar score i sammaband med spelets timer
-                        score += (double)gameTime.ElapsedGameTime.TotalSeconds;
+                        score += (double)gameTime.ElapsedGameTime.TotalSeconds * 2;
 
                         // Player movement, sätter players variabel IsFacingRight till returvärdet av
                         // metoden, som håller koll på vilket håll spelaren är riktad åt.
@@ -400,9 +413,6 @@ namespace BeardDefender_Monogame
 
                         player.CurrentAnimation.Update(gameTime);
                         crabman.CurrentFrameIndex = crabman.Update(_graphics, gameTime);
-
-                        //Updaterar score i sammaband med spelets timer
-                        score += (double)gameTime.ElapsedGameTime.TotalSeconds;
 
                         // Powerups
                         heart.Update(gameTime, player);
@@ -535,14 +545,16 @@ namespace BeardDefender_Monogame
 
                     //Testar bara men ska vara highscore scene här sen.
                     //highscore.DrawBackground(_spriteBatch, MapWidth, MapHeight);
-                    deathScene.DrawBackground(_spriteBatch, MapWidth, MapHeight);
+                    TextBox.Draw(_spriteBatch, new Vector2(100, 100), Color.Black);
+                    deathScene.DrawBackground(_spriteBatch, MapWidth, MapHeight, score);
                     break;
 
                 case Scenes.WIN:
 
                     //Testar bara men ska vara highscore scene här sen.
                     //highscore.DrawBackground(_spriteBatch, MapWidth, MapHeight);
-                    winnerScene.DrawBackground(_spriteBatch, MapWidth, MapHeight);
+                    TextBox.Draw(_spriteBatch, new Vector2(100, 100), Color.Black);
+                    winnerScene.DrawBackground(_spriteBatch, MapWidth, MapHeight, score);
                     break;
             }
 
