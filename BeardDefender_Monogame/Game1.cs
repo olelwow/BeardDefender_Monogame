@@ -97,6 +97,11 @@ namespace BeardDefender_Monogame
         Vector2 ScoreBoxPosition;
         SpriteFont ScoreFont;
 
+        // Ruta för HP
+        //Texture2D hpBox;
+        //Vector2 hpBoxPosition;
+        HealthCounter healthCounter;
+
 
         public Game1()
         {
@@ -131,8 +136,12 @@ namespace BeardDefender_Monogame
             // Powerups
             heart = new Heart(new Rectangle(900, 600, 60, 60));
             jumpBoost = new JumpBoost(new Rectangle(700, 600, 60, 60));
+            //hpBoxPosition = new Vector2(1070, 15);
+            healthCounter = new(new Vector2(1070, 15));
 
             ScoreBoxPosition = new Vector2(0, 15);
+
+
 
             player = new Player(new RectangleF(600, 400, 25, 36));
 
@@ -203,6 +212,10 @@ namespace BeardDefender_Monogame
             //Laddar texturer för scorebox
             ScoreBox = Content.Load<Texture2D>("ScoreBox");
             ScoreFont = Content.Load<SpriteFont>("ScoreFont");
+
+            //Laddar textur för hp box.
+            //hpBox = Content.Load<Texture2D>("ScoreBox");
+            healthCounter.LoadContent(Content); 
 
             //laddar texturer för Highscore
             highscore.LoadContent(Content);
@@ -347,6 +360,8 @@ namespace BeardDefender_Monogame
                         // Powerups
                         heart.Update(gameTime, player);
                         jumpBoost.Update(gameTime, player);
+
+                        healthCounter.Update(gameTime, player);
                     }
                     break;
 
@@ -428,7 +443,7 @@ namespace BeardDefender_Monogame
                         heart.Update(gameTime, player);
                         jumpBoost.Update(gameTime, player);
 
-
+                        healthCounter.Update(gameTime, player);
                     }
                     break;
 
@@ -517,6 +532,8 @@ namespace BeardDefender_Monogame
                     {
                         jumpBoost.Draw(_spriteBatch);
                     }
+                    
+                    healthCounter.Draw(_spriteBatch);
                     break;
 
                 case Scenes.LEVEL_TWO:
@@ -551,6 +568,8 @@ namespace BeardDefender_Monogame
                     {
                         jumpBoost.Draw(_spriteBatch);
                     }
+
+                    healthCounter.Draw(_spriteBatch);
                     break;
 
                 case Scenes.HIGHSCORE:

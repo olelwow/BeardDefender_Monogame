@@ -24,7 +24,7 @@ namespace BeardDefender_Monogame.GameObjects
         private Animation currentAnimation;
         private Animation idleAnimation;
         private Animation runAnimation;
-        private int hP;
+        private int hP = 1;
 
         public Player(RectangleF position)
         {

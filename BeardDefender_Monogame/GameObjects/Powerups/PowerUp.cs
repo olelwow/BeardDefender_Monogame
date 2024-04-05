@@ -33,7 +33,9 @@ namespace BeardDefender_Monogame.GameObjects.Powerups
                 // Reset timer.
                 this.FrameTimer = 0f;
             }
-            if (player.Position.X >= this.Position.X && player.Position.Y == this.Position.Y)
+            Rectangle playerRect = GameMechanics.ConvertRectangleFToRectangle(player.Position);
+
+            if (playerRect.Intersects(this.Position) && !this.Taken)
             {
                 this.Use(player);
             }
