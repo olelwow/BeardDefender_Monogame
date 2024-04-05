@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace BeardDefender_Monogame
 {
@@ -13,11 +14,13 @@ namespace BeardDefender_Monogame
     {
         //Olika layers för att skapa bakgrunden i spelet.
         private Texture2D winnerbackground;
+        private SpriteFont scoreFont;
 
         public void LoadContent(ContentManager Content)
         {
             //Hämtar in respektive bild i variabler.
             this.Winnerbackground = Content.Load<Texture2D>("winner_screen");
+            this.scoreFont = Content.Load<SpriteFont>("ScoreFont");
 
         }
 
@@ -25,7 +28,7 @@ namespace BeardDefender_Monogame
         {
         }
 
-        public void DrawBackground(SpriteBatch _spriteBatch, int MapWidth, int MapHeight)
+        public void DrawBackground(SpriteBatch _spriteBatch, int MapWidth, int MapHeight, double score)
         {
             //Skapar en rektangel i storlek med spelrutan och förstorar bakgrundsbilderna-
             //till samma storlek som spelytan.
@@ -34,6 +37,8 @@ namespace BeardDefender_Monogame
             //Vector2 scale = new Vector2(20f, 20f);
 
             _spriteBatch.Draw(winnerbackground, destinationRectangle, Color.White);
+            _spriteBatch.DrawString(scoreFont, "Score: ", new Vector2(0, 0), Color.Black);
+            _spriteBatch.DrawString(scoreFont, ((int)score).ToString(), new Vector2(100, 0), Color.Black);
 
 
         }

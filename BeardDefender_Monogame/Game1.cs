@@ -12,6 +12,9 @@ using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework.Content;
 using System.ComponentModel;
 using Microsoft.Xna.Framework.Audio;
+using System;
+using System.IO;
+
 
 namespace BeardDefender_Monogame
 {
@@ -46,6 +49,8 @@ namespace BeardDefender_Monogame
         private SpriteBatch _spriteBatch;
         const int MapWidth = 1320;
         const int MapHeight = 720;
+        private static readonly string DesktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+        private static string filePath = Path.Combine(DesktopPath, "Game HighScore.txt");
         private int startX = 5;
 
         bool startGameSelected = true; // Starta spelet är förvalt
@@ -289,7 +294,9 @@ namespace BeardDefender_Monogame
                                 activeScenes = lastPlayedLevel;
                                 break;
                             case MenuOption.SCORE:
-                                activeScenes = Scenes.HIGHSCORE;                                
+                          
+                                activeScenes = Scenes.HIGHSCORE;
+
                                 break;
                             case MenuOption.EXIT:
                                 Exit();
@@ -318,6 +325,8 @@ namespace BeardDefender_Monogame
                         if (player.position.X <= crabman.PositionX + 125 && player.position.Y <= crabman.PositionY + 100)
                         {
                             activeScenes = Scenes.DEATH;
+
+                            File.AppendAllText(filePath, $"\nScore: {((int)Math.Ceiling(score)).ToString()} points");
                             lastPlayedLevel = Scenes.LEVEL_ONE;
                             levelTimer = 0;
                             //playerScore = score;
@@ -361,9 +370,6 @@ namespace BeardDefender_Monogame
                         // Shark movement, returnerar rätt frame index som används i Update.
                         shark.CurrentFrameIndex = shark.Update(_graphics, gameTime);
 
-                        // Hedgehog movement.
-                        hedgehog.Update(gameTime, new Vector2(player.position.X, player.position.Y));
-
                         //Updaterar score i sammaband med spelets timer
                         score += (double)gameTime.ElapsedGameTime.TotalSeconds;
 
@@ -377,9 +383,6 @@ namespace BeardDefender_Monogame
 
                         player.CurrentAnimation.Update(gameTime);
                         //crabman.CurrentFrameIndex = crabman.Update(_graphics, gameTime);
-
-                        //Updaterar score i sammaband med spelets timer
-                        score += (double)gameTime.ElapsedGameTime.TotalSeconds;
 
                         // Powerups
                         heart.Update(gameTime, player);
@@ -395,6 +398,7 @@ namespace BeardDefender_Monogame
                     // Kontrollera om spelaren försöker gå tillbaka till huvudmenyn
                     if (keyboardState.IsKeyDown(Keys.Escape))
                     {
+                        File.AppendAllText(filePath, $"\nScore: {((int)Math.Ceiling(score)).ToString()} points");
                         lastPlayedLevel = activeScenes;
                         activeScenes = Scenes.MAIN_MENU;
                     }
@@ -405,6 +409,7 @@ namespace BeardDefender_Monogame
                         if (player.position.X <= crabman.PositionX + 125 && player.position.Y <= crabman.PositionY + 100)
                         {
                             activeScenes = Scenes.DEATH;
+                            File.AppendAllText(filePath, $"\nScore: {((int)Math.Ceiling(score)).ToString()} points");
                             lastPlayedLevel = Scenes.LEVEL_ONE;
                             levelTimer = 0;
                             //playerScore = score;
@@ -414,6 +419,7 @@ namespace BeardDefender_Monogame
                         if (levelTimer >= LevelTimeLimit)
                         {
                             activeScenes = Scenes.WIN;
+                            File.AppendAllText(filePath, $"\nScore: {((int)Math.Ceiling(score)).ToString()} points");
                             levelTimer = 0;
                         }
 
@@ -447,7 +453,7 @@ namespace BeardDefender_Monogame
                         hedgehog.Update(gameTime, new Vector2(player.position.X, player.position.Y));
 
                         //Updaterar score i sammaband med spelets timer
-                        score += (double)gameTime.ElapsedGameTime.TotalSeconds;
+                        score += (double)gameTime.ElapsedGameTime.TotalSeconds * 2;
 
                         // Player movement, sätter players variabel IsFacingRight till returvärdet av
                         // metoden, som håller koll på vilket håll spelaren är riktad åt.
@@ -458,9 +464,6 @@ namespace BeardDefender_Monogame
                                 groundList);
 
                         player.CurrentAnimation.Update(gameTime);
-
-                        //Updaterar score i sammaband med spelets timer
-                        score += (double)gameTime.ElapsedGameTime.TotalSeconds;
 
                         // Powerups
                         heart.Update(gameTime, player);
@@ -611,15 +614,14 @@ namespace BeardDefender_Monogame
                     highscore.DrawBackground(_spriteBatch, MapWidth, MapHeight);
                     break;
 
-
-                case Scenes.DEATH:                                        
-                    deathScene.DrawBackground(_spriteBatch, MapWidth, MapHeight);
-                    _spriteBatch.DrawString(deathtext, "ME CRABMAN!! I EAT YOU!!!", new Vector2(140, 470), Color.Black);
+                case Scenes.WIN:
+                    
+                    winnerScene.DrawBackground(_spriteBatch, MapWidth, MapHeight, score);
                     break;
 
-                case Scenes.WIN:
-                                       
-                    winnerScene.DrawBackground(_spriteBatch, MapWidth, MapHeight);
+                case Scenes.DEATH:                                        
+                    deathScene.DrawBackground(_spriteBatch, MapWidth, MapHeight, score);
+                    _spriteBatch.DrawString(deathtext, "ME CRABMAN!! I EAT YOU!!!", new Vector2(140, 470), Color.Black);
                     break;
 
             }
