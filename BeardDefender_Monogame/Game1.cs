@@ -55,6 +55,7 @@ namespace BeardDefender_Monogame
         // Powerups
         Heart heart;
         JumpBoost jumpBoost;
+        GemScore gemScore;
 
         // MainMenu object
         MainMenu mainmenu;
@@ -92,7 +93,7 @@ namespace BeardDefender_Monogame
         List<Ground> groundList;
 
         //Score grejer
-        double score = 0;
+        public static double score = 0;
         Texture2D ScoreBox;
         Vector2 ScoreBoxPosition;
         SpriteFont ScoreFont;
@@ -136,6 +137,7 @@ namespace BeardDefender_Monogame
             // Powerups
             heart = new Heart(new Rectangle(900, 600, 60, 60));
             jumpBoost = new JumpBoost(new Rectangle(700, 600, 60, 60));
+            gemScore = new GemScore(new Rectangle(1200, 540, 60, 60));
             //hpBoxPosition = new Vector2(1070, 15);
             healthCounter = new(new Vector2(1070, 15));
 
@@ -239,6 +241,7 @@ namespace BeardDefender_Monogame
             // Powerupzzz
             heart.LoadContent(Content);
             jumpBoost.LoadContent(Content);
+            gemScore.LoadContent(Content);
         }
 
         protected override void Update(GameTime gameTime)
@@ -308,6 +311,12 @@ namespace BeardDefender_Monogame
                         {
                             activeScenes = Scenes.LEVEL_TWO;
                             levelTimer = 0;
+                            gemScore.Taken = false;
+                            heart.Taken = false;
+                            jumpBoost.Taken = false;
+                            heart.Position = new Rectangle(250, 400, 60, 60);
+                            jumpBoost.Position = new Rectangle(700, 520, 60, 60);
+                            gemScore.Position = new Rectangle(1200, 340, 60, 60);
                         }
 
                         // Kontrollera spelarens rörelse för att uppdatera bakgrunden
@@ -327,8 +336,6 @@ namespace BeardDefender_Monogame
                         {
                             ground.Update(gameTime, GraphicsDevice.Viewport.Width);
                         }
-                        shark.CurrentFrameIndex = shark.Update(_graphics, gameTime);
-                        hedgehog.Update(gameTime, new Vector2(player.position.X, player.position.Y));
                         player.IsFacingRight = player.MovePlayer(keyboardState, hedgehog, groundList);
 
                         //returnerar rätt frame index som används i Update.
@@ -352,7 +359,7 @@ namespace BeardDefender_Monogame
                                 groundList);
 
                         player.CurrentAnimation.Update(gameTime);
-                        crabman.CurrentFrameIndex = crabman.Update(_graphics, gameTime);
+                        //crabman.CurrentFrameIndex = crabman.Update(_graphics, gameTime);
 
                         //Updaterar score i sammaband med spelets timer
                         score += (double)gameTime.ElapsedGameTime.TotalSeconds;
@@ -362,6 +369,7 @@ namespace BeardDefender_Monogame
                         jumpBoost.Update(gameTime, player);
 
                         healthCounter.Update(gameTime, player);
+                        gemScore.Update(gameTime, player);
                     }
                     break;
 
@@ -409,8 +417,7 @@ namespace BeardDefender_Monogame
                         {
                             ground.Update(gameTime, GraphicsDevice.Viewport.Width);
                         }
-                        shark.CurrentFrameIndex = shark.Update(_graphics, gameTime);
-                        hedgehog.Update(gameTime, new Vector2(player.position.X, player.position.Y));
+
                         player.IsFacingRight = player.MovePlayer(keyboardState, hedgehog, groundList);
 
                         //returnerar rätt frame index som används i Update.
@@ -434,7 +441,6 @@ namespace BeardDefender_Monogame
                                 groundList);
 
                         player.CurrentAnimation.Update(gameTime);
-                        crabman.CurrentFrameIndex = crabman.Update(_graphics, gameTime);
 
                         //Updaterar score i sammaband med spelets timer
                         score += (double)gameTime.ElapsedGameTime.TotalSeconds;
@@ -442,6 +448,7 @@ namespace BeardDefender_Monogame
                         // Powerups
                         heart.Update(gameTime, player);
                         jumpBoost.Update(gameTime, player);
+                        gemScore.Update(gameTime, player);
 
                         healthCounter.Update(gameTime, player);
                     }
@@ -532,6 +539,12 @@ namespace BeardDefender_Monogame
                     {
                         jumpBoost.Draw(_spriteBatch);
                     }
+
+                    if (!gemScore.Taken)
+                    {
+                        gemScore.Draw(_spriteBatch);
+                    }
+
                     
                     healthCounter.Draw(_spriteBatch);
                     break;
@@ -567,6 +580,11 @@ namespace BeardDefender_Monogame
                     if (!jumpBoost.Taken)
                     {
                         jumpBoost.Draw(_spriteBatch);
+                    }
+
+                    if (!gemScore.Taken)
+                    {
+                        gemScore.Draw(_spriteBatch);
                     }
 
                     healthCounter.Draw(_spriteBatch);
