@@ -85,6 +85,12 @@
 /processorParam:TextureFormat=Color
 /build:BeardDefender100.jpg
 
+#begin BitGame.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:BitGame.mp3
+
 #begin Crabman1.png
 /importer:TextureImporter
 /processor:TextureProcessor
