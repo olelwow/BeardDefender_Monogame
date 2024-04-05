@@ -67,6 +67,7 @@ namespace BeardDefender_Monogame
 
         //Deathscene object
         DeathScene deathScene;
+        SpriteFont deathtext;
 
         //Background object
         Background background;
@@ -193,6 +194,7 @@ namespace BeardDefender_Monogame
 
             //Laddar texturer för deathscene
             deathScene.LoadContent(Content);
+            deathtext = Content.Load<SpriteFont>("DeathSceneFont");
 
             //Laddar texturer för scorebox
             ScoreBox = Content.Load<Texture2D>("ScoreBox");
@@ -274,10 +276,15 @@ namespace BeardDefender_Monogame
                     else
                     {
                         levelTimer += gameTime.ElapsedGameTime.TotalSeconds;
+                        
 
-                        if (player.position.X == crabman.PositionX)
+                        if (player.position.X <= crabman.PositionX + 125 && player.position.Y <= crabman.PositionY + 100)
                         {
                             activeScenes = Scenes.DEATH;
+                            lastPlayedLevel = Scenes.LEVEL_ONE;
+                            levelTimer = 0;
+                            //playerScore = score;
+                            score = 0;
                         }
 
                         if (levelTimer >= LevelTimeLimit)
@@ -347,9 +354,13 @@ namespace BeardDefender_Monogame
                     {
                         levelTimer += gameTime.ElapsedGameTime.TotalSeconds;
 
-                        if (player.position.X == crabman.PositionX)
+                        if (player.position.X <= crabman.PositionX + 125 && player.position.Y <= crabman.PositionY + 100)
                         {
                             activeScenes = Scenes.DEATH;
+                            lastPlayedLevel = Scenes.LEVEL_ONE;
+                            levelTimer = 0;
+                            //playerScore = score;
+                            score = 0;
                         }
 
                         if (levelTimer >= LevelTimeLimit)
@@ -531,19 +542,21 @@ namespace BeardDefender_Monogame
                     }
                     break;
 
-                case Scenes.DEATH:
+                case Scenes.HIGHSCORE:
+                    highscore.DrawBackground(_spriteBatch, MapWidth, MapHeight);
+                    break;
 
-                    //Testar bara men ska vara highscore scene här sen.
-                    //highscore.DrawBackground(_spriteBatch, MapWidth, MapHeight);
+
+                case Scenes.DEATH:                                        
                     deathScene.DrawBackground(_spriteBatch, MapWidth, MapHeight);
+                    _spriteBatch.DrawString(deathtext, "ME CRABMAN!! I EAT YOU!!!", new Vector2(140, 470), Color.Black);
                     break;
 
                 case Scenes.WIN:
-
-                    //Testar bara men ska vara highscore scene här sen.
-                    //highscore.DrawBackground(_spriteBatch, MapWidth, MapHeight);
+                                       
                     winnerScene.DrawBackground(_spriteBatch, MapWidth, MapHeight);
                     break;
+
             }
 
             _spriteBatch.End();
