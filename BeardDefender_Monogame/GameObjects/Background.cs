@@ -13,62 +13,73 @@ namespace BeardDefender_Monogame.GameObjects
         private Texture2D background4;
         private int posX;
         private int posY;
-        private bool isPlayerMoving; 
-        private int playerSpeed; 
+        private bool isPlayerMoving;
+        private int playerSpeed;
+        private int screenWidth;
 
-        public Background(int startX)
+        public Background(int startX, int screenWidth)
         {
             this.posX = startX;
+            this.screenWidth = screenWidth; // Keep track of the screen width
         }
 
         public void LoadContent(ContentManager Content)
         {
-
-            //Hämtar in respektive bild i variabler.
-
+            // Load background textures
             this.Background1 = Content.Load<Texture2D>("Bakgrund1");
             this.Background2 = Content.Load<Texture2D>("Bakgrund2");
             this.Background3 = Content.Load<Texture2D>("Bakgrund3");
             this.Background4 = Content.Load<Texture2D>("Bakgrund4");
         }
 
-        public void Update(GameTime gameTime, int screenWidth, bool isPlayerMoving, int playerSpeed = 0)
+        public void Update(GameTime gameTime, bool isPlayerMoving, int playerSpeed = 1, int playerDirection = 1)
         {
             this.isPlayerMoving = isPlayerMoving;
             this.playerSpeed = playerSpeed;
 
             if (this.isPlayerMoving)
             {
-                // Adjust the scrolling speed based on player speed or a fixed value
-                int scrollSpeedAdjustment = Math.Max(1, playerSpeed);
-                this.posX -= scrollSpeedAdjustment;
+                // Assuming playerDirection is 1 for right and -1 for left
+                int backgroundMovement = playerSpeed * playerDirection;
+
+                // Move the background in relation to the player's speed and direction
+                this.posX -= backgroundMovement;
             }
 
-
-            this.posX -= 1; // Justera tiden för scroll-hastigheten
-
-            // Kollar ifall bakgrunden har scrollat förbi skärmens bredd.
+            // Loop the background
             if (this.posX <= -screenWidth)
             {
-
-                // Reset the position to the right side of the screen
-                this.posX = screenWidth;
+                this.posX = 0; 
+            }
+            else if (this.posX >= screenWidth)
+            {
+                this.posX = 0; 
             }
 
         }
 
-        public void DrawBackground(SpriteBatch _spriteBatch, int MapWidth, int MapHeight)
-        {
-            Vector2 desiredSize = new Vector2(MapWidth, MapHeight);
-            Rectangle destinationRectangle = new Rectangle(posX, posY, (int)desiredSize.X, (int)desiredSize.Y);
 
-            _spriteBatch.Draw(Background1, destinationRectangle, Color.White);
-            _spriteBatch.Draw(Background2, destinationRectangle, Color.White);
-            _spriteBatch.Draw(Background3, destinationRectangle, Color.White);
-            _spriteBatch.Draw(Background4, destinationRectangle, Color.White);
+        public void DrawBackground(SpriteBatch spriteBatch, int mapWidth, int mapHeight)
+        {
+            Vector2 desiredSize = new Vector2(mapWidth, mapHeight);
+            Rectangle destinationRectangle = new Rectangle(posX, posY, (int)desiredSize.X, (int)desiredSize.Y);
+            Rectangle secondaryRectangle = new Rectangle(posX + screenWidth, posY, (int)desiredSize.X, (int)desiredSize.Y); // Offset by screen width
+
+            // Draw each background twice for looping
+            spriteBatch.Draw(Background1, destinationRectangle, Color.White);
+            spriteBatch.Draw(Background1, secondaryRectangle, Color.White);
+
+            spriteBatch.Draw(Background2, destinationRectangle, Color.White);
+            spriteBatch.Draw(Background2, secondaryRectangle, Color.White);
+
+            spriteBatch.Draw(Background3, destinationRectangle, Color.White);
+            spriteBatch.Draw(Background3, secondaryRectangle, Color.White);
+
+            spriteBatch.Draw(Background4, destinationRectangle, Color.White);
+            spriteBatch.Draw(Background4, secondaryRectangle, Color.White);
         }
 
-        // Get/Set
+        // Properties
         public Texture2D Background1 { get; set; }
         public Texture2D Background2 { get; set; }
         public Texture2D Background3 { get; set; }
