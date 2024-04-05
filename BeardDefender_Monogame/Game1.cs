@@ -42,6 +42,7 @@ namespace BeardDefender_Monogame
         private SpriteBatch _spriteBatch;
         const int MapWidth = 1320;
         const int MapHeight = 720;
+        private int startX = 5;
 
         bool startGameSelected = true; // Starta spelet är förvalt
         bool exitGameSelected = false;
@@ -118,10 +119,13 @@ namespace BeardDefender_Monogame
             deathScene = new DeathScene();
             highscore = new Highscore();
             winnerScene = new WinnerScene();
-            background = new Background(0);
-            background2 = new Background(1320);
+            //background = new Background(0);
+            //background2 = new Background(1320);
             shark = new(new Vector2(100, 100));
             crabman = new Crabman();
+            background = new Background(startX, GraphicsDevice.Viewport.Width);
+            background2 = new Background(startX, GraphicsDevice.Viewport.Width);
+
 
             // Powerups
             heart = new Heart(new Rectangle(900, 600, 60, 60));
@@ -288,11 +292,15 @@ namespace BeardDefender_Monogame
 
                         // Kontrollera spelarens rörelse för att uppdatera bakgrunden
                         bool isPlayerMoving = keyboardState.IsKeyDown(Keys.Left) || keyboardState.IsKeyDown(Keys.Right);
+                        int playerDirection = keyboardState.IsKeyDown(Keys.Right) ? 1 : -1;
                         int playerSpeed = 5;
 
-                        background.Update(gameTime, GraphicsDevice.Viewport.Width, isPlayerMoving, playerSpeed);
-                        background2.Update(gameTime, GraphicsDevice.Viewport.Width, isPlayerMoving, playerSpeed);
-
+                        // Only update the background if the player is actually moving
+                        if (isPlayerMoving)
+                        {
+                            background.Update(gameTime, isPlayerMoving, playerSpeed, playerDirection);
+                            background2.Update(gameTime, isPlayerMoving, playerSpeed, playerDirection);
+                        }
                         // Uppdatera spelarposition, fiender, osv.
                         player.position.Y = groundLower.Position.Y - (player.Texture.Height / 4);
                         foreach (Ground ground in groundList)
@@ -360,11 +368,15 @@ namespace BeardDefender_Monogame
 
                         // Kontrollera spelarens rörelse för att uppdatera bakgrunden
                         bool isPlayerMoving = keyboardState.IsKeyDown(Keys.Left) || keyboardState.IsKeyDown(Keys.Right);
+                        int playerDirection = keyboardState.IsKeyDown(Keys.Right) ? 1 : -1;
                         int playerSpeed = 5;
 
-                        background.Update(gameTime, GraphicsDevice.Viewport.Width, isPlayerMoving, playerSpeed);
-                        background2.Update(gameTime, GraphicsDevice.Viewport.Width, isPlayerMoving, playerSpeed);
-
+                        // Only update the background if the player is actually moving
+                        if (isPlayerMoving)
+                        {
+                            background.Update(gameTime, isPlayerMoving, playerSpeed, playerDirection);
+                            background2.Update(gameTime, isPlayerMoving, playerSpeed, playerDirection);
+                        }
                         // Uppdatera spelarposition, fiender, osv.
                         player.position.Y = groundLower.Position.Y - (player.Texture.Height / 4);
                         foreach (Ground ground in groundList)
@@ -372,11 +384,8 @@ namespace BeardDefender_Monogame
                             ground.Update(gameTime, GraphicsDevice.Viewport.Width);
                         }
                         shark.CurrentFrameIndex = shark.Update(_graphics, gameTime);
-
-                        //hedgehog.Update(gameTime, new Vector2(player.position.X, player.position.Y));
-
+                        hedgehog.Update(gameTime, new Vector2(player.position.X, player.position.Y));
                         player.IsFacingRight = player.MovePlayer(keyboardState, hedgehog, groundList);
-
 
                         //returnerar rätt frame index som används i Update.
                         crabman.CurrentFrameIndex = crabman.Update(_graphics, gameTime);
@@ -385,7 +394,7 @@ namespace BeardDefender_Monogame
                         shark.CurrentFrameIndex = shark.Update(_graphics, gameTime);
 
                         // Hedgehog movement.
-                        //hedgehog.Update(gameTime, new Vector2(player.position.X, player.position.Y));
+                        hedgehog.Update(gameTime, new Vector2(player.position.X, player.position.Y));
 
                         //Updaterar score i sammaband med spelets timer
                         score += (double)gameTime.ElapsedGameTime.TotalSeconds;
@@ -407,6 +416,8 @@ namespace BeardDefender_Monogame
                         // Powerups
                         heart.Update(gameTime, player);
                         jumpBoost.Update(gameTime, player);
+
+
                     }
                     break;
 
