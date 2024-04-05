@@ -275,7 +275,7 @@ namespace BeardDefender_Monogame
                     {
                         levelTimer += gameTime.ElapsedGameTime.TotalSeconds;
 
-                        if (player.position.X == crabman.PositionX)
+                        if (player.position.X <= crabman.PositionX + 125 && player.position.Y <= crabman.PositionY - 100)
                         {
                             activeScenes = Scenes.DEATH;
                         }
@@ -347,7 +347,7 @@ namespace BeardDefender_Monogame
                     {
                         levelTimer += gameTime.ElapsedGameTime.TotalSeconds;
 
-                        if (player.position.X == crabman.PositionX)
+                        if (player.position.X <= crabman.PositionX)
                         {
                             activeScenes = Scenes.DEATH;
                         }
@@ -531,19 +531,20 @@ namespace BeardDefender_Monogame
                     }
                     break;
 
-                case Scenes.DEATH:
+                case Scenes.HIGHSCORE:
+                    highscore.DrawBackground(_spriteBatch, MapWidth, MapHeight);
+                    break;
 
-                    //Testar bara men ska vara highscore scene här sen.
-                    //highscore.DrawBackground(_spriteBatch, MapWidth, MapHeight);
+
+                case Scenes.DEATH:                                        
                     deathScene.DrawBackground(_spriteBatch, MapWidth, MapHeight);
                     break;
 
                 case Scenes.WIN:
-
-                    //Testar bara men ska vara highscore scene här sen.
-                    //highscore.DrawBackground(_spriteBatch, MapWidth, MapHeight);
+                                       
                     winnerScene.DrawBackground(_spriteBatch, MapWidth, MapHeight);
                     break;
+
             }
 
             _spriteBatch.End();
