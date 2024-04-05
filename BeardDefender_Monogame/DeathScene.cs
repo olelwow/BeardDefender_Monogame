@@ -67,7 +67,7 @@ namespace BeardDefender_Monogame
             _spriteBatch.Draw(
                     this.textureArray[currentFrameIndex],
                     new Vector2(
-                        positionX, //position.X
+                        positionX - 60, //position.X
                         positionY), //position.Y
 
                     null,

@@ -169,6 +169,13 @@
 /processorParam:TextureFormat=Color
 /build:CrabmandDeath4.png
 
+#begin DeathSceneFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:DeathSceneFont.spritefont
+
 #begin Font.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
