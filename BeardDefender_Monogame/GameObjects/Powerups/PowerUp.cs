@@ -19,9 +19,9 @@ namespace BeardDefender_Monogame.GameObjects.Powerups
 
         public abstract void Use(Player player);
         public abstract void LoadContent(ContentManager Content);
+ 
         public void Update(GameTime gameTime, Player player)
         {
-
             this.Texture = this.TextureAnimations[this.CurrentFrameIndex];
             // Uppdatera frameTimer
             this.FrameTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -38,8 +38,10 @@ namespace BeardDefender_Monogame.GameObjects.Powerups
             if (playerRect.Intersects(this.Position) && !this.Taken)
             {
                 this.Use(player);
+                this.Taken = true; // Markera power-upen som tagen
             }
         }
+
         public abstract void Draw(SpriteBatch _spriteBatch);
 
         // Get/Set
