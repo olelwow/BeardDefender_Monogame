@@ -271,13 +271,10 @@ namespace BeardDefender_Monogame
                         switch (currentMenuOption)
                         {
                             case MenuOption.PLAY:
-                                
                                 activeScenes = lastPlayedLevel;
                                 break;
                             case MenuOption.SCORE:
-                                //activeScenes = Scenes.HIGHSCORE;
-                                activeScenes = Scenes.DEATH;
-
+                                activeScenes = Scenes.HIGHSCORE;
                                 break;
                             case MenuOption.EXIT:
                                 Exit();
@@ -307,7 +304,7 @@ namespace BeardDefender_Monogame
                         {
                             activeScenes = Scenes.DEATH;
 
-                            File.AppendAllText(filePath, $"\nScore: {((int)Math.Ceiling(score)).ToString()}");
+                            File.AppendAllText(filePath, $"\nScore: {((int)Math.Ceiling(score)).ToString()} points");
                             lastPlayedLevel = Scenes.LEVEL_ONE;
                             levelTimer = 0;
                             //playerScore = score;
@@ -379,7 +376,7 @@ namespace BeardDefender_Monogame
                     // Kontrollera om spelaren försöker gå tillbaka till huvudmenyn
                     if (keyboardState.IsKeyDown(Keys.Escape))
                     {
-                        File.AppendAllText(filePath, $"\nScore: {((int)Math.Ceiling(score)).ToString()}");
+                        File.AppendAllText(filePath, $"\nScore: {((int)Math.Ceiling(score)).ToString()} points");
                         lastPlayedLevel = activeScenes;
                         activeScenes = Scenes.MAIN_MENU;
                     }
@@ -390,7 +387,7 @@ namespace BeardDefender_Monogame
                         if (player.position.X <= crabman.PositionX + 125 && player.position.Y <= crabman.PositionY + 100)
                         {
                             activeScenes = Scenes.DEATH;
-                            File.AppendAllText(filePath, $"\nScore: {((int)Math.Ceiling(score)).ToString()}");
+                            File.AppendAllText(filePath, $"\nScore: {((int)Math.Ceiling(score)).ToString()} points");
                             lastPlayedLevel = Scenes.LEVEL_ONE;
                             levelTimer = 0;
                             //playerScore = score;
@@ -400,7 +397,7 @@ namespace BeardDefender_Monogame
                         if (levelTimer >= LevelTimeLimit)
                         {
                             activeScenes = Scenes.WIN;
-                            File.AppendAllText(filePath, $"\nScore: {((int)Math.Ceiling(score)).ToString()}");
+                            File.AppendAllText(filePath, $"\nScore: {((int)Math.Ceiling(score)).ToString()} points");
                             levelTimer = 0;
                         }
 
