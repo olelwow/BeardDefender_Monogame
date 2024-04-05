@@ -46,6 +46,7 @@ namespace BeardDefender_Monogame
         const int MapHeight = 720;
         private static readonly string DesktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         private static string filePath = Path.Combine(DesktopPath, "Game HighScore.txt");
+        private int startX = 5;
 
         bool startGameSelected = true; // Starta spelet är förvalt
         bool exitGameSelected = false;
@@ -58,6 +59,7 @@ namespace BeardDefender_Monogame
         // Powerups
         Heart heart;
         JumpBoost jumpBoost;
+        GemScore gemScore;
 
         // MainMenu object
         MainMenu mainmenu;
@@ -71,6 +73,7 @@ namespace BeardDefender_Monogame
 
         //Deathscene object
         DeathScene deathScene;
+        SpriteFont deathtext;
 
         //Background object
         Background background;
@@ -94,10 +97,16 @@ namespace BeardDefender_Monogame
         List<Ground> groundList;
 
         //Score grejer
-        double score = 0;
+        public static double score = 0;
         Texture2D ScoreBox;
         Vector2 ScoreBoxPosition;
         SpriteFont ScoreFont;
+
+        // Ruta för HP
+        //Texture2D hpBox;
+        //Vector2 hpBoxPosition;
+        HealthCounter healthCounter;
+
 
         public Game1()
         {
@@ -121,16 +130,24 @@ namespace BeardDefender_Monogame
             deathScene = new DeathScene();
             highscore = new Highscore();
             winnerScene = new WinnerScene();
-            background = new Background(0);
-            background2 = new Background(1320);
+            //background = new Background(0);
+            //background2 = new Background(1320);
             shark = new(new Vector2(100, 100));
             crabman = new Crabman();
+            background = new Background(startX, GraphicsDevice.Viewport.Width);
+            background2 = new Background(startX, GraphicsDevice.Viewport.Width);
+
 
             // Powerups
             heart = new Heart(new Rectangle(900, 600, 60, 60));
             jumpBoost = new JumpBoost(new Rectangle(700, 600, 60, 60));
+            gemScore = new GemScore(new Rectangle(1200, 540, 60, 60));
+            //hpBoxPosition = new Vector2(1070, 15);
+            healthCounter = new(new Vector2(1070, 15));
 
             ScoreBoxPosition = new Vector2(0, 15);
+
+
 
             player = new Player(new RectangleF(600, 400, 25, 36));
 
@@ -196,10 +213,15 @@ namespace BeardDefender_Monogame
 
             //Laddar texturer för deathscene
             deathScene.LoadContent(Content);
+            deathtext = Content.Load<SpriteFont>("DeathSceneFont");
 
             //Laddar texturer för scorebox
             ScoreBox = Content.Load<Texture2D>("ScoreBox");
             ScoreFont = Content.Load<SpriteFont>("ScoreFont");
+
+            //Laddar textur för hp box.
+            //hpBox = Content.Load<Texture2D>("ScoreBox");
+            healthCounter.LoadContent(Content); 
 
             //laddar texturer för Highscore
             highscore.LoadContent(Content);
@@ -223,6 +245,7 @@ namespace BeardDefender_Monogame
             // Powerupzzz
             heart.LoadContent(Content);
             jumpBoost.LoadContent(Content);
+            gemScore.LoadContent(Content);
         }
 
         protected override void Update(GameTime gameTime)
@@ -232,7 +255,7 @@ namespace BeardDefender_Monogame
             switch (activeScenes)
             {
                 case Scenes.MAIN_MENU:
-
+                    mainmenu.Update(gameTime);
                     // Loopa genom menyvalen
                     if (keyboardState.IsKeyDown(Keys.Down) && !previousDownPressed)
                     {
@@ -278,34 +301,48 @@ namespace BeardDefender_Monogame
                     else
                     {
                         levelTimer += gameTime.ElapsedGameTime.TotalSeconds;
+                        
 
-                        if (player.position.X == crabman.PositionX)
+                        if (player.position.X <= crabman.PositionX + 125 && player.position.Y <= crabman.PositionY + 100)
                         {
                             activeScenes = Scenes.DEATH;
+
                             File.AppendAllText(filePath, $"\nScore: {((int)Math.Ceiling(score)).ToString()}");
+                            lastPlayedLevel = Scenes.LEVEL_ONE;
+                            levelTimer = 0;
+                            //playerScore = score;
+                            score = 0;
                         }
 
                         if (levelTimer >= LevelTimeLimit)
                         {
                             activeScenes = Scenes.LEVEL_TWO;
                             levelTimer = 0;
+                            gemScore.Taken = false;
+                            heart.Taken = false;
+                            jumpBoost.Taken = false;
+                            heart.Position = new Rectangle(250, 400, 60, 60);
+                            jumpBoost.Position = new Rectangle(700, 520, 60, 60);
+                            gemScore.Position = new Rectangle(1200, 340, 60, 60);
                         }
 
                         // Kontrollera spelarens rörelse för att uppdatera bakgrunden
                         bool isPlayerMoving = keyboardState.IsKeyDown(Keys.Left) || keyboardState.IsKeyDown(Keys.Right);
+                        int playerDirection = keyboardState.IsKeyDown(Keys.Right) ? 1 : -1;
                         int playerSpeed = 5;
 
-                        background.Update(gameTime, GraphicsDevice.Viewport.Width, isPlayerMoving, playerSpeed);
-                        background2.Update(gameTime, GraphicsDevice.Viewport.Width, isPlayerMoving, playerSpeed);
-
+                        // Only update the background if the player is actually moving
+                        if (isPlayerMoving)
+                        {
+                            background.Update(gameTime, isPlayerMoving, playerSpeed, playerDirection);
+                            background2.Update(gameTime, isPlayerMoving, playerSpeed, playerDirection);
+                        }
                         // Uppdatera spelarposition, fiender, osv.
                         player.position.Y = groundLower.Position.Y - (player.Texture.Height / 4);
                         foreach (Ground ground in groundList)
                         {
                             ground.Update(gameTime, GraphicsDevice.Viewport.Width);
                         }
-                        shark.CurrentFrameIndex = shark.Update(_graphics, gameTime);
-                        hedgehog.Update(gameTime, new Vector2(player.position.X, player.position.Y));
                         player.IsFacingRight = player.MovePlayer(keyboardState, hedgehog, groundList);
 
                         //returnerar rätt frame index som används i Update.
@@ -326,11 +363,14 @@ namespace BeardDefender_Monogame
                                 groundList);
 
                         player.CurrentAnimation.Update(gameTime);
-                        crabman.CurrentFrameIndex = crabman.Update(_graphics, gameTime);
+                        //crabman.CurrentFrameIndex = crabman.Update(_graphics, gameTime);
 
                         // Powerups
                         heart.Update(gameTime, player);
                         jumpBoost.Update(gameTime, player);
+
+                        healthCounter.Update(gameTime, player);
+                        gemScore.Update(gameTime, player);
                     }
                     break;
 
@@ -347,10 +387,14 @@ namespace BeardDefender_Monogame
                     {
                         levelTimer += gameTime.ElapsedGameTime.TotalSeconds;
 
-                        if (player.position.X == crabman.PositionX)
+                        if (player.position.X <= crabman.PositionX + 125 && player.position.Y <= crabman.PositionY + 100)
                         {
                             activeScenes = Scenes.DEATH;
                             File.AppendAllText(filePath, $"\nScore: {((int)Math.Ceiling(score)).ToString()}");
+                            lastPlayedLevel = Scenes.LEVEL_ONE;
+                            levelTimer = 0;
+                            //playerScore = score;
+                            score = 0;
                         }
 
                         if (levelTimer >= LevelTimeLimit)
@@ -362,23 +406,23 @@ namespace BeardDefender_Monogame
 
                         // Kontrollera spelarens rörelse för att uppdatera bakgrunden
                         bool isPlayerMoving = keyboardState.IsKeyDown(Keys.Left) || keyboardState.IsKeyDown(Keys.Right);
+                        int playerDirection = keyboardState.IsKeyDown(Keys.Right) ? 1 : -1;
                         int playerSpeed = 5;
 
-                        background.Update(gameTime, GraphicsDevice.Viewport.Width, isPlayerMoving, playerSpeed);
-                        background2.Update(gameTime, GraphicsDevice.Viewport.Width, isPlayerMoving, playerSpeed);
-
+                        // Only update the background if the player is actually moving
+                        if (isPlayerMoving)
+                        {
+                            background.Update(gameTime, isPlayerMoving, playerSpeed, playerDirection);
+                            background2.Update(gameTime, isPlayerMoving, playerSpeed, playerDirection);
+                        }
                         // Uppdatera spelarposition, fiender, osv.
                         player.position.Y = groundLower.Position.Y - (player.Texture.Height / 4);
                         foreach (Ground ground in groundList)
                         {
                             ground.Update(gameTime, GraphicsDevice.Viewport.Width);
                         }
-                        shark.CurrentFrameIndex = shark.Update(_graphics, gameTime);
-
-                        //hedgehog.Update(gameTime, new Vector2(player.position.X, player.position.Y));
 
                         player.IsFacingRight = player.MovePlayer(keyboardState, hedgehog, groundList);
-
 
                         //returnerar rätt frame index som används i Update.
                         crabman.CurrentFrameIndex = crabman.Update(_graphics, gameTime);
@@ -387,7 +431,7 @@ namespace BeardDefender_Monogame
                         shark.CurrentFrameIndex = shark.Update(_graphics, gameTime);
 
                         // Hedgehog movement.
-                        //hedgehog.Update(gameTime, new Vector2(player.position.X, player.position.Y));
+                        hedgehog.Update(gameTime, new Vector2(player.position.X, player.position.Y));
 
                         //Updaterar score i sammaband med spelets timer
                         score += (double)gameTime.ElapsedGameTime.TotalSeconds * 2;
@@ -401,11 +445,13 @@ namespace BeardDefender_Monogame
                                 groundList);
 
                         player.CurrentAnimation.Update(gameTime);
-                        crabman.CurrentFrameIndex = crabman.Update(_graphics, gameTime);
 
                         // Powerups
                         heart.Update(gameTime, player);
                         jumpBoost.Update(gameTime, player);
+                        gemScore.Update(gameTime, player);
+
+                        healthCounter.Update(gameTime, player);
                     }
                     break;
 
@@ -494,6 +540,14 @@ namespace BeardDefender_Monogame
                     {
                         jumpBoost.Draw(_spriteBatch);
                     }
+
+                    if (!gemScore.Taken)
+                    {
+                        gemScore.Draw(_spriteBatch);
+                    }
+
+                    
+                    healthCounter.Draw(_spriteBatch);
                     break;
 
                 case Scenes.LEVEL_TWO:
@@ -528,21 +582,29 @@ namespace BeardDefender_Monogame
                     {
                         jumpBoost.Draw(_spriteBatch);
                     }
+
+                    if (!gemScore.Taken)
+                    {
+                        gemScore.Draw(_spriteBatch);
+                    }
+
+                    healthCounter.Draw(_spriteBatch);
                     break;
 
-                case Scenes.DEATH:
-
-                    //Testar bara men ska vara highscore scene här sen.
-                    //highscore.DrawBackground(_spriteBatch, MapWidth, MapHeight);
-                    deathScene.DrawBackground(_spriteBatch, MapWidth, MapHeight, score);
+                case Scenes.HIGHSCORE:
+                    highscore.DrawBackground(_spriteBatch, MapWidth, MapHeight);
                     break;
 
                 case Scenes.WIN:
-
-                    //Testar bara men ska vara highscore scene här sen.
-                    //highscore.DrawBackground(_spriteBatch, MapWidth, MapHeight);
+                    
                     winnerScene.DrawBackground(_spriteBatch, MapWidth, MapHeight, score);
                     break;
+
+                case Scenes.DEATH:                                        
+                    deathScene.DrawBackground(_spriteBatch, MapWidth, MapHeight, score);
+                    _spriteBatch.DrawString(deathtext, "ME CRABMAN!! I EAT YOU!!!", new Vector2(140, 470), Color.Black);
+                    break;
+
             }
 
             _spriteBatch.End();
