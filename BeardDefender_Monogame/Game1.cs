@@ -99,11 +99,6 @@ namespace BeardDefender_Monogame
         Vector2 ScoreBoxPosition;
         SpriteFont ScoreFont;
 
-        //Username input
-        TextBox TextBox;
-        public string username = "";
-
-
         public Game1()
         {
             activeScenes = Scenes.MAIN_MENU;
@@ -206,9 +201,6 @@ namespace BeardDefender_Monogame
             ScoreBox = Content.Load<Texture2D>("ScoreBox");
             ScoreFont = Content.Load<SpriteFont>("ScoreFont");
 
-            //Laddar texture för username textbox
-            TextBox = new TextBox(ScoreFont);
-
             //laddar texturer för Highscore
             highscore.LoadContent(Content);
 
@@ -290,7 +282,6 @@ namespace BeardDefender_Monogame
                         if (player.position.X == crabman.PositionX)
                         {
                             activeScenes = Scenes.DEATH;
-                            TextBox.Update();
                             File.AppendAllText(filePath, $"\nScore: {((int)Math.Ceiling(score)).ToString()}");
                         }
 
@@ -359,15 +350,13 @@ namespace BeardDefender_Monogame
                         if (player.position.X == crabman.PositionX)
                         {
                             activeScenes = Scenes.DEATH;
-                            TextBox.Update();
                             File.AppendAllText(filePath, $"\nScore: {((int)Math.Ceiling(score)).ToString()}");
                         }
 
                         if (levelTimer >= LevelTimeLimit)
                         {
                             activeScenes = Scenes.WIN;
-                            TextBox.Update();
-                            File.AppendAllText(filePath, $"\n{username}: {((int)Math.Ceiling(score)).ToString()}");
+                            File.AppendAllText(filePath, $"\nScore: {((int)Math.Ceiling(score)).ToString()}");
                             levelTimer = 0;
                         }
 
@@ -545,7 +534,6 @@ namespace BeardDefender_Monogame
 
                     //Testar bara men ska vara highscore scene här sen.
                     //highscore.DrawBackground(_spriteBatch, MapWidth, MapHeight);
-                    TextBox.Draw(_spriteBatch, new Vector2(100, 100), Color.Black);
                     deathScene.DrawBackground(_spriteBatch, MapWidth, MapHeight, score);
                     break;
 
@@ -553,7 +541,6 @@ namespace BeardDefender_Monogame
 
                     //Testar bara men ska vara highscore scene här sen.
                     //highscore.DrawBackground(_spriteBatch, MapWidth, MapHeight);
-                    TextBox.Draw(_spriteBatch, new Vector2(100, 100), Color.Black);
                     winnerScene.DrawBackground(_spriteBatch, MapWidth, MapHeight, score);
                     break;
             }
