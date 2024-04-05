@@ -54,7 +54,7 @@ namespace BeardDefender_Monogame
             return currentFrameIndex;
         }
 
-        public void DrawBackground(SpriteBatch _spriteBatch, int MapWidth, int MapHeight)
+        public void DrawBackground(SpriteBatch _spriteBatch, int MapWidth, int MapHeight, double score)
         {
             //Skapar en rektangel i storlek med spelrutan och förstorar bakgrundsbilderna-
             //till samma storlek som spelytan.

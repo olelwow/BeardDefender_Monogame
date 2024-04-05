@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using System.IO;
 
 namespace BeardDefender_Monogame
 {
@@ -9,6 +10,7 @@ namespace BeardDefender_Monogame
     {    
         //Olika layers för att skapa bakgrunden i spelet.
         private Texture2D highscorebackground;
+        private StreamReader streamReader;
        
         public void LoadContent(ContentManager Content)
         {
