@@ -52,6 +52,7 @@ namespace BeardDefender_Monogame.GameObjects
         {
             this.idleAnimation = new Animation(Content.Load<Texture2D>("Idle-Left"), 0.1f, true);
             this.runAnimation = new Animation(Content.Load<Texture2D>("Run-LEFT"), 0.1f, true);
+            this.jumpAnimation = new Animation(Content.Load<Texture2D>("Jump-Left"), 0.1f, true);
             this.texture = Content.Load<Texture2D>("Run-Right");
             this.currentAnimation = runAnimation;
         }
@@ -77,6 +78,11 @@ namespace BeardDefender_Monogame.GameObjects
                 keyboardState.IsKeyDown(Keys.Right))
             {
                 currentAnimation = runAnimation;
+            }
+            else if (keyboardState.IsKeyDown(Keys.Space)
+                || !isOnGround)
+            {
+                currentAnimation = jumpAnimation;
             }
             else
             {
@@ -160,13 +166,13 @@ namespace BeardDefender_Monogame.GameObjects
             if (keyboardState.IsKeyDown(Keys.A)
                 || keyboardState.IsKeyDown(Keys.Left))
             {
-                //IsFacingRight = false;
+                IsFacingRight = true;
                 velocity.X = -MoveAcceleration;
             }
             else if (keyboardState.IsKeyDown(Keys.D)
                 || keyboardState.IsKeyDown(Keys.Right))
             {
-                //isFacingRight = true;
+                isFacingRight = false;
                 velocity.X = MoveAcceleration;
             }
             else
