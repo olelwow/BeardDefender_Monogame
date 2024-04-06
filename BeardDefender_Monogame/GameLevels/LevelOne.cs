@@ -47,7 +47,7 @@ namespace BeardDefender_Monogame.GameLevels
                 }
             }
             // Uppdatera spelarposition, fiender, osv.
-            player.position.Y = groundList[0].Position.Y - (player.Texture.Height / 4);
+            //player.position.Y = groundList[0].Position.Y - (player.Texture.Height / 4);
             foreach (Ground ground in groundList)
             {
                 ground.Update(gameTime, graphicsDevice.Viewport.Width);
@@ -57,6 +57,7 @@ namespace BeardDefender_Monogame.GameLevels
             player.IsFacingRight =
                 player.MovePlayer(
                     keyboardState,
+                    gameTime,
                     hedgehog,
                     groundList,
                     (JumpBoost)powerUpList[1]);
