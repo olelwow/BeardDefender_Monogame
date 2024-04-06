@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using BeardDefender_Monogame.GameObjects.Powerups;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -62,7 +63,7 @@ namespace BeardDefender_Monogame.GameObjects
             )
         {
             Update(keyboardState, gameTime, groundList);
-            
+
 
             if (keyboardState.IsKeyDown(Keys.W) ||
                 keyboardState.IsKeyDown(Keys.Up) ||

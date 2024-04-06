@@ -7,8 +7,6 @@ namespace BeardDefender_Monogame.GameObjects.Powerups
 {
     internal abstract class PowerUp
     {
-        private bool addHp;
-        private bool increaseJumpHeight;
         private Texture2D texture;
         private Texture2D[] textureAnimations;
         private Rectangle position;
@@ -65,16 +63,7 @@ namespace BeardDefender_Monogame.GameObjects.Powerups
             get { return frameTimer; }
             set { frameTimer = value; }
         }
-        public bool AddHp
-        {
-            get { return addHp; }
-            set { addHp = value; }
-        }
-        public bool IncreaseJumpHeight
-        {
-            get { return increaseJumpHeight; }
-            set { increaseJumpHeight = value; }
-        }
+        
         public Texture2D Texture
         {
             get { return texture; }
