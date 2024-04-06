@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Numerics;
@@ -14,12 +15,7 @@ namespace BeardDefender_Monogame.GameObjects
     internal class Player
     {
         public RectangleF position;
-        private RectangleF positionNew;
-        private bool jumping;
-        private bool isOnBlock;
-        private int jumpHeight;
-        private float speed = 4.05f;
-        private float jumpingSpeed;
+        private RectangleF velocity;
         private Texture2D texture;
         private bool isFacingRight;
         private Animation currentAnimation;
@@ -27,10 +23,29 @@ namespace BeardDefender_Monogame.GameObjects
         private Animation runAnimation;
         private int hP = 1;
 
+        private Animation jumpAnimation;
+        private SpriteBatch spriteBatch;
+        private bool isOnGround;
+
+        private const float MoveAcceleration = 1000.0f; // Minskad för långsammare acceleration
+        private const float MaxMoveSpeed = 200.0f; // Minskad för lägre maxhastighet
+        private const float GroundDragFactor = 0.58f;
+        private const float AirDragFactor = 0.65f;
+        private const float MaxJumpTime = 0.25f; // Justera för att påverka hur länge spelaren kan påverka hoppet uppåt
+        private const float JumpLaunchVelocity = -1000.0f; // Högre värde för högre hopp
+        private const float GravityAcceleration = 1500.0f; // Öka för snabbare fall, minska för långsammare
+        private const float MaxFallSpeed = 450.0f; // Justera max fallhastighet
+        private const float JumpControlPower = 0.14f; // Justera för att påverka spelarens kontroll under hoppet
+
+        float jumpTime;
+        bool isJumping;
+
+
+
         public Player(RectangleF position)
         {
             this.position = position;
-            this.positionNew = position;
+            this.velocity = position;
         }
         
         public void LoadContent (ContentManager Content)
@@ -43,42 +58,12 @@ namespace BeardDefender_Monogame.GameObjects
 
         public bool MovePlayer(
             KeyboardState keyboardState, 
-            Hedgehog hedgehog,
-            List<Ground> groundList,
-            JumpBoost jumpBoost
+            GameTime gameTime,
+            List<Ground> groundList
             )
         {
-            GameMechanics.ApplyGravity(groundList, this, hedgehog);
-            GameMechanics.EnemyCollision(hedgehog, this);
+            Update(keyboardState, gameTime, groundList);
 
-            if (keyboardState.IsKeyDown(Keys.Left) || keyboardState.IsKeyDown(Keys.A))
-            {
-                this.position.X -= speed;
-                isFacingRight = true;
-            }
-            else if (keyboardState.IsKeyDown(Keys.Right) || keyboardState.IsKeyDown(Keys.D))
-            {
-                this.position.X += speed;
-                isFacingRight = false;
-            }
-            if (keyboardState.IsKeyDown(Keys.Space))
-            {
-                if (!jumping && !jumpBoost.Taken)
-                {
-                    jumping = true;
-                    jumpHeight = 150;
-                }
-                else if (!jumping)
-                {
-                    jumping = true;
-                    jumpHeight = 200;
-                }
-            }
-
-            if (jumping)
-            {
-                Jump();
-            }
 
             if (keyboardState.IsKeyDown(Keys.W) ||
                 keyboardState.IsKeyDown(Keys.Up) ||
@@ -99,27 +84,107 @@ namespace BeardDefender_Monogame.GameObjects
             return isFacingRight;
         }
 
-        public void Jump ()
+        public void Update(KeyboardState keyBoardstate, GameTime gameTime, List<Ground> groundList)
         {
-            if (jumping)
+            GetInput(keyBoardstate);
+            ApplyPhysics(gameTime);
+            HandleCollisions(groundList);
+        }
+
+        //Metod som kontrollerar om det finns kollision med ground/marken
+        private void HandleCollisions(List<Ground> groundList)
+        {
+            isOnGround = false;
+            foreach (var ground in groundList)
             {
-                jumpingSpeed = 3;
-                if (jumpHeight > -5)
+                if (position.Y + texture.Height > ground.Position.Y
+                    &&
+                    position.X < ground.Position.X + ground.Position.Width &&
+                    position.X + texture.Width > ground.Position.X &&
+                    position.Y < ground.Position.Y + ground.Position.Height)
                 {
-                    // Minskar spelarens Y värde med värdet på jumpHeight,
-                    // minskar värdet på jumpHeight med -2 vid varje check.
-                    // Spelaren flyttas snabbt upp till högsta punkten i nuvarande kod,
-                    // får kollas på senare... Jag trött.
-                    position.Y -= jumpHeight; 
-                    jumpHeight -= 2; 
-                }
-                else 
-                {
-                    jumpHeight = 0;
-                    jumping = false;
-                    jumpingSpeed = 5;
+                    float groundTop = ground.Position.Y;
+                    float playerBottom = position.Y + texture.Height;
+                    if (playerBottom <= groundTop + velocity.Y)
+                    {
+                        isOnGround = true;
+                        velocity.Y = 0;
+                        position.Y = groundTop - (texture.Height / 4);
+                    }
                 }
             }
+        }
+
+        //Metod som lägger fysik till spellarens rörelse
+        private void ApplyPhysics(GameTime gameTime)
+        {
+            float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            if (isJumping)
+            {
+                // Om spelaren fortfarande håller i hoppknappen men inte har hoppat för länge, fortsätt att ge hoppkraft uppåt
+                if (jumpTime > 0.0f)
+                {
+                    velocity.Y += JumpLaunchVelocity * (1.0f - (float)Math.Pow(jumpTime / MaxJumpTime, JumpControlPower));
+                }
+                jumpTime += elapsed;
+            }
+
+            velocity.Y = MathHelper.Clamp(velocity.Y + GravityAcceleration * elapsed, -MaxFallSpeed, MaxFallSpeed);
+            velocity.X *= (isOnGround ? GroundDragFactor : AirDragFactor);
+
+            //Update positionen X och Y...
+            position.Y += velocity.Y * elapsed;
+            position.X += velocity.X * elapsed;
+            //...och lagra den till nya positionen
+            position = new RectangleF((float)Math.Round(position.X), (float)Math.Round(position.Y), position.Width, position.Height);
+
+            // Återställ hoppet när spelaren landar på marken
+            if (position.Y > 720)
+            {
+                position.Y = 720;
+                isOnGround = true;
+                isJumping = false;
+                velocity.Y = 0;
+            }
+        }
+
+        //Metod som registrerar tanget input för spelarens rörelse
+        private void GetInput(KeyboardState keyboardState)
+        {
+            isJumping = keyboardState.IsKeyDown(Keys.Space);
+
+            //If-satsen som påverkar rörelse väster/höger
+            if (keyboardState.IsKeyDown(Keys.A)
+                || keyboardState.IsKeyDown(Keys.Left))
+            {
+                //IsFacingRight = false;
+                velocity.X = -MoveAcceleration;
+            }
+            else if (keyboardState.IsKeyDown(Keys.D)
+                || keyboardState.IsKeyDown(Keys.Right))
+            {
+                //isFacingRight = true;
+                velocity.X = MoveAcceleration;
+            }
+            else
+            {
+                velocity.X = 0;
+            }
+
+            //If-satsen som påverkar jump
+            if (keyboardState.IsKeyDown(Keys.Space)
+                && isOnGround)
+            {
+                isOnGround = false;
+                isJumping = true;
+                jumpTime = 0.0f;
+            }
+            else if (keyboardState.IsKeyUp(Keys.Space))
+            {
+                isJumping = false;
+            }
+            
         }
 
         public void DrawPlayer(SpriteBatch _spriteBatch)
@@ -145,27 +210,11 @@ namespace BeardDefender_Monogame.GameObjects
             );
         }
 
-
         // Get/Set
         public int HP
         {
             get { return hP; }
             set { hP = value; } 
-        }
-        public bool IsOnBlock
-        {
-            get { return isOnBlock; }
-            set { isOnBlock = value; }
-        }
-        public float Speed
-        {
-            get { return speed; }
-            set { speed = value; }
-        }
-        public bool Jumping
-        {
-            get { return this.jumping; }
-            set { this.jumping = value; }
         }
         public bool IsFacingRight
         {
@@ -174,8 +223,8 @@ namespace BeardDefender_Monogame.GameObjects
         }
         public RectangleF PositionNew
         {
-            get { return positionNew; }
-            set { positionNew = value; }
+            get { return velocity; }
+            set { velocity = value; }
         }
         public RectangleF Position
         {

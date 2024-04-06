@@ -184,7 +184,7 @@ namespace BeardDefender_Monogame
             //Laddar musikfilen
             ContentManager content = new ContentManager(this.Services, "Content");
             backgroundMusic = content.Load<Song>("BitGame");
-            MediaPlayer.Volume = 0.3f;
+            MediaPlayer.Volume = 0.05f;
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
@@ -215,6 +215,7 @@ namespace BeardDefender_Monogame
             winnerScene.LoadContent(Content);
 
             // Laddar texturer och animationer för Player.
+            player = new Player(new RectangleF(600, 400, 25, 36));
             player.LoadContent(Content);
 
             //Texturer för crabman
@@ -259,6 +260,7 @@ namespace BeardDefender_Monogame
                     }
                     else
                     {
+
                         levelTimer += gameTime.ElapsedGameTime.TotalSeconds;
                         
                         if (player.position.X <= crabman.PositionX + 125 && player.position.Y <= crabman.PositionY + 100)
@@ -270,6 +272,7 @@ namespace BeardDefender_Monogame
                         {
                             LevelOne.ChangeLevel(this, powerUpList);
                         }
+
                         LevelOne.Update
                             (keyboardState,
                             gameTime,
@@ -283,6 +286,7 @@ namespace BeardDefender_Monogame
                             shark,
                             powerUpList,
                             healthCounter);
+
                     }
                 break;
 
@@ -307,6 +311,7 @@ namespace BeardDefender_Monogame
                             levelTimer = 0;
                         }
 
+
                         LevelTwo.Update
                             (keyboardState,
                             gameTime,
@@ -320,6 +325,7 @@ namespace BeardDefender_Monogame
                             shark,
                             powerUpList,
                             healthCounter);
+
                     }
                 break;
 
