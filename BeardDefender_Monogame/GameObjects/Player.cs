@@ -24,7 +24,7 @@ namespace BeardDefender_Monogame.GameObjects
         private int hP = 1;
 
         private Animation jumpAnimation;
-        private SpriteBatch spriteBatch;
+        //private SpriteBatch spriteBatch;
         private bool isOnGround;
 
         private const float MoveAcceleration = 1000.0f; // Minskad för långsammare acceleration
@@ -39,8 +39,6 @@ namespace BeardDefender_Monogame.GameObjects
 
         float jumpTime;
         bool isJumping;
-
-
 
         public Player(RectangleF position)
         {

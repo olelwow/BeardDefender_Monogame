@@ -42,13 +42,16 @@ namespace BeardDefender_Monogame
         private static string filePath = Path.Combine(DesktopPath, "Game HighScore.txt");
         private int startX = 5;
 
+        // Till scenebyte för WIN och DEATH scene
+        private double menuSceneChangeTimeDelay = 0;
+
         //Musik
         Song backgroundMusic;
 
         // Powerups
-        Heart heart;
-        JumpBoost jumpBoost;
-        GemScore gemScore;
+        Heart Heart;
+        JumpBoost JumpBoost;
+        GemScore GemScore;
         List<PowerUp> powerUpList;
 
         // MainMenu object
@@ -74,7 +77,7 @@ namespace BeardDefender_Monogame
         Hedgehog hedgehog;
         Crabman crabman;
         //Player object
-        Player player;
+        Player Player;
 
         // Obstacles/Ground
         Ground groundLower;
@@ -89,7 +92,7 @@ namespace BeardDefender_Monogame
         public static Vector2 ScoreBoxPosition;
         public static SpriteFont ScoreFont;
         // Ruta för HP
-        HealthCounter healthCounter;
+        HealthCounter HealthCounter;
         public Game1()
         {
             activeScenes = Scenes.MAIN_MENU;
@@ -98,6 +101,7 @@ namespace BeardDefender_Monogame
             this.Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
+
         protected override void Initialize()
         {
             // Grafikinställningar.
@@ -241,114 +245,138 @@ namespace BeardDefender_Monogame
             {
                 MediaPlayer.Play(backgroundMusic);
             }
+
             KeyboardState keyboardState = Keyboard.GetState();
 
-            switch (activeScenes)
+            // Skapa delay så scene inte byts till main menu vid escape-knapptryck när man står i death eller win scene
+            menuSceneChangeTimeDelay += gameTime.ElapsedGameTime.TotalSeconds;
+
+            // Tillåt ändring efter en halv sekund
+            if (menuSceneChangeTimeDelay >= 0.5) 
             {
-                case Scenes.MAIN_MENU:
+                switch (activeScenes)
+                {
+                    case Scenes.MAIN_MENU:
 
-                    // Uppdaterar bakgrunden på main menu samt loopar igenom menyvalen.
-                    mainmenu.Update(gameTime, this, keyboardState);
-                break;
+                        // Uppdaterar bakgrunden på main menu samt loopar igenom menyvalen.
+                        mainmenu.Update(gameTime, this, keyboardState);
+                        break;
 
-                case Scenes.LEVEL_ONE:
+                    case Scenes.LEVEL_ONE:
 
-                    // Kontrollera om spelaren försöker gå tillbaka till huvudmenyn
-                    if (keyboardState.IsKeyDown(Keys.Escape))
-                    {
-                        GameLevel.ShowMainMenu(this);
-                    }
-                    else
-                    {
-
-                        levelTimer += gameTime.ElapsedGameTime.TotalSeconds;
-                        
-                        if (player.position.X <= crabman.PositionX + 125 && player.position.Y <= crabman.PositionY + 100)
+                        // Kontrollera om spelaren försöker gå tillbaka till huvudmenyn
+                        if (keyboardState.IsKeyDown(Keys.Escape))
                         {
-                            GameLevel.DeathByCrabman(this, filePath);
+                            GameLevel.ShowMainMenu(this);
                         }
-
-                        if (levelTimer >= LevelTimeLimit)
+                        else
                         {
-                            LevelOne.ChangeLevel(this, powerUpList);
+                            levelTimer += gameTime.ElapsedGameTime.TotalSeconds;
+
+                            if (player.position.X <= crabman.PositionX + 125 && player.position.Y <= crabman.PositionY + 100)
+                            {
+                                GameLevel.DeathByCrabman(gameTime, this, filePath);
+                            }
+
+                            if (levelTimer >= LevelTimeLimit)
+                            {
+                                LevelOne.ChangeLevel(this, powerUpList);
+                            }
+
+                            LevelOne.Update
+                                (keyboardState,
+                                gameTime,
+                                this.GraphicsDevice,
+                                _graphics,
+                                backgroundList,
+                                player,
+                                groundList,
+                                hedgehog,
+                                crabman,
+                                shark,
+                                powerUpList,
+                                healthCounter);
                         }
+                        break;
 
-                        LevelOne.Update
-                            (keyboardState,
-                            gameTime,
-                            this.GraphicsDevice,
-                            _graphics,
-                            backgroundList,
-                            player,
-                            groundList,
-                            hedgehog,
-                            crabman,
-                            shark,
-                            powerUpList,
-                            healthCounter);
+                    case Scenes.LEVEL_TWO:
 
-                    }
-                break;
-
-                case Scenes.LEVEL_TWO:
-
-                    // Kontrollera om spelaren försöker gå tillbaka till huvudmenyn
-                    if (keyboardState.IsKeyDown(Keys.Escape))
-                    {
-                        GameLevel.ShowMainMenu(this);
-                    }
-                    else
-                    {
-                        levelTimer += gameTime.ElapsedGameTime.TotalSeconds;
-                        if (player.position.X <= crabman.PositionX + 125 && player.position.Y <= crabman.PositionY + 100)
+                        // Kontrollera om spelaren försöker gå tillbaka till huvudmenyn
+                        if (keyboardState.IsKeyDown(Keys.Escape))
                         {
-                            GameLevel.DeathByCrabman(this, filePath);
+                            GameLevel.ShowMainMenu(this);
                         }
-                        if (levelTimer >= LevelTimeLimit)
+                        else
                         {
-                            activeScenes = Scenes.WIN;
-                            File.AppendAllText(filePath, $"\nScore: {((int)Math.Ceiling(score)).ToString()} points");
-                            levelTimer = 0;
+                            levelTimer += gameTime.ElapsedGameTime.TotalSeconds;
+                            if (player.position.X <= crabman.PositionX + 125 && player.position.Y <= crabman.PositionY + 100)
+                            {
+                                GameLevel.DeathByCrabman(gameTime, this, filePath);
+                            }
+                            if (levelTimer >= LevelTimeLimit)
+                            {
+                                File.AppendAllText(filePath, $"\nScore: {((int)Math.Ceiling(score)).ToString()} points");
+                                activeScenes = Scenes.WIN;
+                                levelTimer = 0;
+
+                                player.HP = 1;
+
+                                healthCounter.Update(gameTime, player);
+
+                                gemScore.Taken = false;
+                                heart.Taken = false;
+                                jumpBoost.Taken = false;
+
+                                gemScore.Position = new Rectangle(1200, 540, 60, 60);
+                                heart.Position = new Rectangle(900, 600, 60, 60);
+                                jumpBoost.Position = new Rectangle(700, 600, 60, 60);
+                                player.Position = new RectangleF(600, 400, 25, 36);
+                            }
+
+
+                            LevelTwo.Update
+                                (keyboardState,
+                                gameTime,
+                                this.GraphicsDevice,
+                                _graphics,
+                                backgroundList,
+                                player,
+                                groundList,
+                                hedgehog,
+                                crabman,
+                                shark,
+                                powerUpList,
+                                healthCounter);
                         }
+                        break;
 
+                    case Scenes.HIGHSCORE:
+                        if (keyboardState.IsKeyDown(Keys.Escape))
+                        {
+                            activeScenes = Scenes.MAIN_MENU;
+                        }
+                        break;
 
-                        LevelTwo.Update
-                            (keyboardState,
-                            gameTime,
-                            this.GraphicsDevice,
-                            _graphics,
-                            backgroundList,
-                            player,
-                            groundList,
-                            hedgehog,
-                            crabman,
-                            shark,
-                            powerUpList,
-                            healthCounter);
+                    case Scenes.DEATH:
+                        if (keyboardState.IsKeyDown(Keys.Escape))
+                        {
+                            activeScenes = Scenes.HIGHSCORE;
+                            menuSceneChangeTimeDelay = 0;
+                            LastPlayedLevel = Scenes.LEVEL_ONE;
+                            Game1.score = 0;
+                        }
+                        break;
 
-                    }
-                break;
-
-                case Scenes.HIGHSCORE:
-                    if (keyboardState.IsKeyDown(Keys.Escape))
-                    {
-                        activeScenes = Scenes.MAIN_MENU;
-                    }
-                break;
-
-                case Scenes.DEATH:
-                    if (keyboardState.IsKeyDown(Keys.Escape))
-                    {
-                        activeScenes = Scenes.MAIN_MENU;
-                    }
-                break;
-
-                case Scenes.WIN:
-                    if (keyboardState.IsKeyDown(Keys.Escape))
-                    {
-                        activeScenes = Scenes.MAIN_MENU;
-                    }
-                break;
+                    case Scenes.WIN:
+                        if (keyboardState.IsKeyDown(Keys.Escape))
+                        {
+                            activeScenes = Scenes.HIGHSCORE;
+                            menuSceneChangeTimeDelay = 0;
+                            LastPlayedLevel = Scenes.LEVEL_ONE;
+                            Game1.score = 0;
+                        }
+                        break;
+                }
             }
             //Flytta in i deathscene när vi har fixat kollision med fiende.
             deathScene.CurrentFrameIndex = deathScene.Update(_graphics, gameTime);
@@ -400,7 +428,7 @@ namespace BeardDefender_Monogame
                     winnerScene.DrawBackground(_spriteBatch, MapWidth, MapHeight, score);
                 break;
 
-                case Scenes.DEATH:                                        
+                case Scenes.DEATH:
                     deathScene.DrawBackground(_spriteBatch, MapWidth, MapHeight, score);
                     _spriteBatch.DrawString(deathtext, "ME CRABMAN!! I EAT YOU!!!", new Vector2(140, 470), Color.Black);
                 break;
@@ -408,6 +436,8 @@ namespace BeardDefender_Monogame
             _spriteBatch.End();
             base.Draw(gameTime);
         }
+
+        // Get set
         public Scenes ActiveScenes
         {
             get { return this.activeScenes; }
@@ -422,6 +452,31 @@ namespace BeardDefender_Monogame
         {
             get { return this.levelTimer; }
             set { this.levelTimer = value; }
+        }
+        internal Player player
+        {
+            get { return this.Player; }
+            set { Player = value; }
+        }
+        internal HealthCounter healthCounter
+        {
+            get { return this.HealthCounter; }
+            set { this.HealthCounter = value; }
+        }
+        internal Heart heart
+        {
+            get { return this.Heart; }
+            set { Heart = value; }
+        }
+        internal JumpBoost jumpBoost
+        {
+            get { return this.JumpBoost; }
+            set { JumpBoost = value; }
+        }
+        internal GemScore gemScore
+        {
+            get { return this.GemScore; }
+            set { GemScore = value; }
         }
     }
 }

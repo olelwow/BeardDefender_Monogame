@@ -13,7 +13,7 @@ namespace BeardDefender_Monogame.GameObjects
 {
     internal class Crabman : Enemy
     {
-        RectangleF position = new RectangleF();
+        //RectangleF position = new RectangleF();
         private Texture2D currentTexture;
         private Texture2D[] textureArray; // Innehåller texturer för rörelse till höger.
         float frameDuration = 0.2f; // Hastighet på animationen.
@@ -26,7 +26,6 @@ namespace BeardDefender_Monogame.GameObjects
         {
             // Array MÅSTE intieras innan man försöker lägga in textures i den.
             this.textureArray = new Texture2D[3];
-
         }
 
 
@@ -73,6 +72,7 @@ namespace BeardDefender_Monogame.GameObjects
                     0f);
         }
 
+
         public Texture2D[] TextureArray
         {
             get { return textureArray; }
@@ -102,7 +102,5 @@ namespace BeardDefender_Monogame.GameObjects
             get { return positionY; }
             set { positionY = value; }
         }
-
     }
-
 }
