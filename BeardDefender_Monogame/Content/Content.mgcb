@@ -175,6 +175,12 @@
 /processorParam:TextureFormat=Color
 /build:CrabmandDeath4.png
 
+#begin death_scene.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:death_scene.mp3
+
 #begin DeathSceneFont.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
