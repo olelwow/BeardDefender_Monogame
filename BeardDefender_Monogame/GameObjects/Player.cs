@@ -34,7 +34,7 @@ namespace BeardDefender_Monogame.GameObjects
         private const float MaxJumpTime = 0.25f; // Justera för att påverka hur länge spelaren kan påverka hoppet uppåt
         private const float JumpLaunchVelocity = -1000.0f; // Högre värde för högre hopp
         private const float GravityAcceleration = 1500.0f; // Öka för snabbare fall, minska för långsammare
-        private const float MaxFallSpeed = 450.0f; // Justera max fallhastighet
+        private const float MaxFallSpeed = 550.0f; // Justera max fallhastighet
         private const float JumpControlPower = 0.14f; // Justera för att påverka spelarens kontroll under hoppet
 
         float jumpTime;
@@ -59,7 +59,9 @@ namespace BeardDefender_Monogame.GameObjects
         public bool MovePlayer(
             KeyboardState keyboardState, 
             GameTime gameTime,
-            List<Ground> groundList
+            Hedgehog hedgehog,
+            List<Ground> groundList, 
+            PowerUp jumpBoosts
             )
         {
             Update(keyboardState, gameTime, groundList);
