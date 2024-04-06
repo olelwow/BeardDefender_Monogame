@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using BeardDefender_Monogame.GameObjects.Powerups;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -43,7 +44,8 @@ namespace BeardDefender_Monogame.GameObjects
         public bool MovePlayer(
             KeyboardState keyboardState, 
             Hedgehog hedgehog,
-            List<Ground> groundList
+            List<Ground> groundList,
+            JumpBoost jumpBoost
             )
         {
             GameMechanics.ApplyGravity(groundList, this, hedgehog);
@@ -61,10 +63,15 @@ namespace BeardDefender_Monogame.GameObjects
             }
             if (keyboardState.IsKeyDown(Keys.Space))
             {
-                if (!jumping)
+                if (!jumping && !jumpBoost.Taken)
                 {
                     jumping = true;
                     jumpHeight = 150;
+                }
+                else if (!jumping)
+                {
+                    jumping = true;
+                    jumpHeight = 200;
                 }
             }
 

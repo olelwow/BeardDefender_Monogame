@@ -14,9 +14,6 @@ namespace BeardDefender_Monogame.GameObjects.Powerups
         {
             this.TextureAnimations = new Texture2D[2];
             this.Position = position;
-            this.IncreaseJumpHeight = true;
-
-            this.AddHp = false;
         }
         public override void Draw(SpriteBatch _spriteBatch)
         {
