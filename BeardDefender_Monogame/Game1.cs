@@ -209,7 +209,7 @@ namespace BeardDefender_Monogame
             //Laddar musikfilen
             ContentManager content = new ContentManager(this.Services, "Content");
             backgroundMusic = content.Load<Song>("BitGame");
-            MediaPlayer.Volume = 0.3f;
+            MediaPlayer.Volume = 0.05f;
 
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -243,6 +243,7 @@ namespace BeardDefender_Monogame
             winnerScene.LoadContent(Content);
 
             // Laddar texturer och animationer för Player.
+            player = new Player(new RectangleF(600, 400, 25, 36));
             player.LoadContent(Content);
 
             //Texturer för crabman
@@ -319,6 +320,7 @@ namespace BeardDefender_Monogame
                     }
                     else
                     {
+
                         levelTimer += gameTime.ElapsedGameTime.TotalSeconds;
                         
 
@@ -356,13 +358,12 @@ namespace BeardDefender_Monogame
                             background.Update(gameTime, isPlayerMoving, playerSpeed, playerDirection);
                             background2.Update(gameTime, isPlayerMoving, playerSpeed, playerDirection);
                         }
-                        // Uppdatera spelarposition, fiender, osv.
-                        player.position.Y = groundLower.Position.Y - (player.Texture.Height / 4);
+
+                        // Uppdatera ground position.
                         foreach (Ground ground in groundList)
                         {
                             ground.Update(gameTime, GraphicsDevice.Viewport.Width);
                         }
-                        player.IsFacingRight = player.MovePlayer(keyboardState, hedgehog, groundList);
 
                         //returnerar rätt frame index som används i Update.
                         crabman.CurrentFrameIndex = crabman.Update(_graphics, gameTime);
@@ -376,10 +377,10 @@ namespace BeardDefender_Monogame
                         // Player movement, sätter players variabel IsFacingRight till returvärdet av
                         // metoden, som håller koll på vilket håll spelaren är riktad åt.
                         player.IsFacingRight =
-                            player.MovePlayer(
-                                keyboardState,
-                                hedgehog,
-                                groundList);
+                        player.MovePlayer(
+                            keyboardState,
+                            gameTime,
+                            groundList);
 
                         player.CurrentAnimation.Update(gameTime);
                         //crabman.CurrentFrameIndex = crabman.Update(_graphics, gameTime);
@@ -434,14 +435,11 @@ namespace BeardDefender_Monogame
                             background.Update(gameTime, isPlayerMoving, playerSpeed, playerDirection);
                             background2.Update(gameTime, isPlayerMoving, playerSpeed, playerDirection);
                         }
-                        // Uppdatera spelarposition, fiender, osv.
-                        player.position.Y = groundLower.Position.Y - (player.Texture.Height / 4);
+                        // Uppdatera ground position.
                         foreach (Ground ground in groundList)
                         {
                             ground.Update(gameTime, GraphicsDevice.Viewport.Width);
                         }
-
-                        player.IsFacingRight = player.MovePlayer(keyboardState, hedgehog, groundList);
 
                         //returnerar rätt frame index som används i Update.
                         crabman.CurrentFrameIndex = crabman.Update(_graphics, gameTime);
@@ -460,7 +458,7 @@ namespace BeardDefender_Monogame
                         player.IsFacingRight =
                             player.MovePlayer(
                                 keyboardState,
-                                hedgehog,
+                                gameTime,
                                 groundList);
 
                         player.CurrentAnimation.Update(gameTime);
