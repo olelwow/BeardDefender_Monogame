@@ -37,7 +37,7 @@ namespace BeardDefender_Monogame
 
             int vertical = MapHeight / 2 - 200;
             _spriteBatch.Draw(highscorebackground, destinationRectangle, Color.White);
-            _spriteBatch.Draw(ScoreBackground, new Vector2(900, 160), Color.White);
+            _spriteBatch.Draw(ScoreBackground, new Vector2(900, 155), Color.White);
             // Try catch med meddelande ifall highscore-filen inte skapats än
             try
             {
