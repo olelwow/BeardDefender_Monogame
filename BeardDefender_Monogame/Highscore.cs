@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using System.IO;
 using System;
+using System.Collections.Immutable;
 
 namespace BeardDefender_Monogame
 {
@@ -11,6 +12,7 @@ namespace BeardDefender_Monogame
     {
         //Olika layers för att skapa bakgrunden i spelet.
         private Texture2D highscorebackground;
+        private Texture2D ScoreBackground;
         private SpriteFont spriteFont;
        
         public void LoadContent(ContentManager Content)
@@ -18,6 +20,7 @@ namespace BeardDefender_Monogame
             //Hämtar in respektive bild i variabler.
             this.Highscorebackground = Content.Load<Texture2D>("highscore_screen");
             this.spriteFont = Content.Load<SpriteFont>("ScoreFont");    
+            this.ScoreBackground = Content.Load<Texture2D>("ScoreBackground");
         }
 
         public void Update(GameTime gameTime)
@@ -34,7 +37,7 @@ namespace BeardDefender_Monogame
 
             int vertical = MapHeight / 2 - 200;
             _spriteBatch.Draw(highscorebackground, destinationRectangle, Color.White);
-
+            _spriteBatch.Draw(ScoreBackground, new Vector2(900, 160), Color.White);
             // Try catch med meddelande ifall highscore-filen inte skapats än
             try
             {
@@ -45,14 +48,41 @@ namespace BeardDefender_Monogame
                             Environment.SpecialFolder.Desktop),
                             "Game highscore.txt"));
 
-                // Rita varje rad i filen
-                foreach (string line in lines)
+                for (int i = 0; i < lines.Length; i++)
                 {
-                    _spriteBatch.DrawString(spriteFont, line, new Vector2(MapWidth / 2 + 300, vertical), Color.Black);
-
-                    // Justera för nästa rad
-                    vertical += 35;
+                    for (int j = i + 1; j < lines.Length; j++)
+                    {
+                        if (int.Parse(lines[j].Split(' ')[1]) > int.Parse(lines[i].Split(' ')[1]))
+                        {
+                            string temp = lines[i];
+                            lines[i] = lines[j];
+                            lines[j] = temp;
+                        }
+                    }
                 }
+
+                // Rita varje rad i filen
+                if (lines.Length > 10)
+                {
+                    for (int i = 0; i < 10; i++)
+                    {
+                        _spriteBatch.DrawString(spriteFont, lines[i], new Vector2(MapWidth / 2 + 260, vertical), Color.Black);
+
+                        // Justera för nästa rad
+                        vertical += 35;
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < lines.Length; i++)
+                    {
+                        _spriteBatch.DrawString(spriteFont, lines[i], new Vector2(MapWidth / 2 + 260, vertical), Color.Black);
+
+                        // Justera för nästa rad
+                        vertical += 35;
+                    }
+                }   
+                
             }
             catch (FileNotFoundException)
             {

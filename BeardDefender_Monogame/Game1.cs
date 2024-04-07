@@ -431,6 +431,7 @@ namespace BeardDefender_Monogame
                 case Scenes.DEATH:
                     deathScene.DrawBackground(_spriteBatch, MapWidth, MapHeight, score);
                     _spriteBatch.DrawString(deathtext, "ME CRABMAN!! I EAT YOU!!!", new Vector2(140, 470), Color.Black);
+                    _spriteBatch.DrawString(ScoreFont, "Score: " + ((int)score).ToString(), new Vector2(600, 560), Color.Black); //position är hardkodat...
                 break;
             }
             _spriteBatch.End();
