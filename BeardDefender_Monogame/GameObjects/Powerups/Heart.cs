@@ -14,10 +14,12 @@ namespace BeardDefender_Monogame.GameObjects.Powerups
         {
             this.TextureAnimations = new Texture2D[2];
             this.Position = position;
-            this.AddHp = true;
-            
-            this.IncreaseJumpHeight = false;
         }
+
+        public Heart(System.Drawing.Rectangle rectangle)
+        {
+        }
+
         public override void Draw(SpriteBatch _spriteBatch)
         {
             Vector2 scale = new(0.15f, 0.15f);

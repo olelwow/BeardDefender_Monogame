@@ -85,6 +85,12 @@
 /processorParam:TextureFormat=Color
 /build:BeardDefender100.jpg
 
+#begin BitGame.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:BitGame.mp3
+
 #begin Crabman1.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -168,6 +174,12 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:CrabmandDeath4.png
+
+#begin death_scene.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:death_scene.mp3
 
 #begin DeathSceneFont.spritefont
 /importer:FontDescriptionImporter

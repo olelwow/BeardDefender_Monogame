@@ -7,10 +7,10 @@ namespace BeardDefender_Monogame.GameObjects
 {
     internal class Background
     {
-        private Texture2D background1;
-        private Texture2D background2;
-        private Texture2D background3;
-        private Texture2D background4;
+        //private Texture2D background1;
+        //private Texture2D background2;
+        //private Texture2D background3;
+        //private Texture2D background4;
         private int posX;
         private int posY;
         private bool isPlayerMoving;
@@ -55,7 +55,6 @@ namespace BeardDefender_Monogame.GameObjects
             {
                 this.posX = 0; 
             }
-
         }
 
 
@@ -64,19 +63,24 @@ namespace BeardDefender_Monogame.GameObjects
             Vector2 desiredSize = new Vector2(mapWidth, mapHeight);
             Rectangle destinationRectangle = new Rectangle(posX, posY, (int)desiredSize.X, (int)desiredSize.Y);
             Rectangle secondaryRectangle = new Rectangle(posX + screenWidth, posY, (int)desiredSize.X, (int)desiredSize.Y); // Offset by screen width
+            Rectangle leftRectangle = new Rectangle(posX - screenWidth, posY, (int)desiredSize.X, (int)desiredSize.Y);
 
             // Draw each background twice for looping
             spriteBatch.Draw(Background1, destinationRectangle, Color.White);
             spriteBatch.Draw(Background1, secondaryRectangle, Color.White);
+            spriteBatch.Draw(Background1, leftRectangle, Color.White);
 
             spriteBatch.Draw(Background2, destinationRectangle, Color.White);
             spriteBatch.Draw(Background2, secondaryRectangle, Color.White);
+            spriteBatch.Draw(Background2, leftRectangle, Color.White);
 
             spriteBatch.Draw(Background3, destinationRectangle, Color.White);
             spriteBatch.Draw(Background3, secondaryRectangle, Color.White);
+            spriteBatch.Draw(Background3, leftRectangle, Color.White);
 
             spriteBatch.Draw(Background4, destinationRectangle, Color.White);
             spriteBatch.Draw(Background4, secondaryRectangle, Color.White);
+            spriteBatch.Draw(Background4, leftRectangle, Color.White);
         }
 
         // Properties

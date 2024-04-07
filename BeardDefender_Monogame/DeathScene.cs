@@ -12,9 +12,10 @@ namespace BeardDefender_Monogame
     internal class DeathScene
     {
         //Olika layers för att skapa bakgrunden i spelet.
-        private Texture2D deathSceneBackground;
+        //private Texture2D deathSceneBackground;
         private Texture2D currentTexture;
         private Texture2D[] textureArray;
+        private SpriteFont scoreFont;
         float frameDuration = 0.2f; // Hastighet på animationen.
         float frameTimer = 0f;
         int currentFrameIndex; // Variabel som väljer vilken frame man tar ur arrayen.
@@ -37,7 +38,7 @@ namespace BeardDefender_Monogame
             this.TextureArray[2] = Content.Load<Texture2D>("CrabmandDeath3");
             this.TextureArray[3] = Content.Load<Texture2D>("CrabmandDeath4");
             this.CurrentTexture = this.TextureArray[0];
-
+            scoreFont = Content.Load<SpriteFont>("ScoreFont");
         }
 
         public int Update(GraphicsDeviceManager _graphics, GameTime gameTime)
@@ -80,13 +81,10 @@ namespace BeardDefender_Monogame
                     SpriteEffects.None,
                     0f);
 
-
-
+            _spriteBatch.DrawString(scoreFont, "Score: " + ((int)score).ToString(), new Vector2(0, 0), Color.Black);
         }
 
         // Get/Set
-       
-
         public Texture2D[] TextureArray
         {
             get { return textureArray; }
@@ -116,7 +114,5 @@ namespace BeardDefender_Monogame
             get { return positionY; }
             set { positionY = value; }
         }
-
     }
 }
-

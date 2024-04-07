@@ -21,7 +21,6 @@ namespace BeardDefender_Monogame
             //Hämtar in respektive bild i variabler.
             this.Winnerbackground = Content.Load<Texture2D>("winner_screen");
             this.scoreFont = Content.Load<SpriteFont>("ScoreFont");
-
         }
 
         public void Update(GameTime gameTime)
@@ -37,10 +36,8 @@ namespace BeardDefender_Monogame
             //Vector2 scale = new Vector2(20f, 20f);
 
             _spriteBatch.Draw(winnerbackground, destinationRectangle, Color.White);
-            _spriteBatch.DrawString(scoreFont, "Score: ", new Vector2(0, 0), Color.Black);
-            _spriteBatch.DrawString(scoreFont, ((int)score).ToString(), new Vector2(100, 0), Color.Black);
-
-
+            _spriteBatch.DrawString(scoreFont, "Score: ", new Vector2(0, 0), Color.Red);
+            _spriteBatch.DrawString(scoreFont, ((int)score).ToString(), new Vector2(100, 0), Color.Red);
         }
 
         // Get/Set
@@ -49,7 +46,5 @@ namespace BeardDefender_Monogame
             get { return winnerbackground; }
             set { winnerbackground = value; }
         }
-
-
     }
 }
