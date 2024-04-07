@@ -8,7 +8,7 @@ using System;
 namespace BeardDefender_Monogame
 {
     internal class Highscore //: Background
-    {    
+    {
         //Olika layers för att skapa bakgrunden i spelet.
         private Texture2D highscorebackground;
         private SpriteFont spriteFont;
@@ -17,8 +17,7 @@ namespace BeardDefender_Monogame
         {
             //Hämtar in respektive bild i variabler.
             this.Highscorebackground = Content.Load<Texture2D>("highscore_screen");
-            this.spriteFont = Content.Load<SpriteFont>("ScoreFont");
-    
+            this.spriteFont = Content.Load<SpriteFont>("ScoreFont");    
         }
 
         public void Update(GameTime gameTime)
@@ -32,18 +31,34 @@ namespace BeardDefender_Monogame
             Vector2 desiredSize = new Vector2(MapWidth, MapHeight);
             Rectangle destinationRectangle = new Rectangle(0, 0, (int)desiredSize.X, (int)desiredSize.Y);
             Vector2 scale = new Vector2(20f, 20f);
-            string[] lines = File.ReadAllLines(
-                Path.Combine(
-                    Environment.GetFolderPath(
-                        Environment.SpecialFolder.Desktop),
-                        "Game highscore.txt"));
 
-            _spriteBatch.Draw(Highscorebackground, destinationRectangle, Color.White);
             int vertical = MapHeight / 2 - 200;
-            foreach (string line in lines)
+            _spriteBatch.Draw(highscorebackground, destinationRectangle, Color.White);
+
+            // Try catch med meddelande ifall highscore-filen inte skapats än
+            try
             {
-                _spriteBatch.DrawString(spriteFont, line, new Vector2(MapWidth / 2 + 300, vertical), Color.Black);
-                vertical += 35;
+                // Försök läsa highscore-fil
+                string[] lines = File.ReadAllLines(
+                    Path.Combine(
+                        Environment.GetFolderPath(
+                            Environment.SpecialFolder.Desktop),
+                            "Game highscore.txt"));
+
+                // Rita varje rad i filen
+                foreach (string line in lines)
+                {
+                    _spriteBatch.DrawString(spriteFont, line, new Vector2(MapWidth / 2 + 300, vertical), Color.Black);
+
+                    // Justera för nästa rad
+                    vertical += 35;
+                }
+            }
+            catch (FileNotFoundException)
+            {
+                // Meddela ifall filen inte finns
+                string message = "             No highscore available.\n\nWhat are you waiting for BeardDefender?\n\n              GO PLAY THE GAME!!!";
+                _spriteBatch.DrawString(spriteFont, message, new Vector2(MapWidth / 2 - spriteFont.MeasureString(message).X / 2, vertical), Color.Red);
             }
         }
 
@@ -53,7 +68,5 @@ namespace BeardDefender_Monogame
             get { return highscorebackground; }
             set { highscorebackground = value; }
         }
-               
-        
     }
 }

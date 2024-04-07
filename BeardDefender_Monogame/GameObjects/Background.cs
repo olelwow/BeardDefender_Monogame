@@ -7,10 +7,10 @@ namespace BeardDefender_Monogame.GameObjects
 {
     internal class Background
     {
-        private Texture2D background1;
-        private Texture2D background2;
-        private Texture2D background3;
-        private Texture2D background4;
+        //private Texture2D background1;
+        //private Texture2D background2;
+        //private Texture2D background3;
+        //private Texture2D background4;
         private int posX;
         private int posY;
         private bool isPlayerMoving;
@@ -55,7 +55,6 @@ namespace BeardDefender_Monogame.GameObjects
             {
                 this.posX = 0; 
             }
-
         }
 
 

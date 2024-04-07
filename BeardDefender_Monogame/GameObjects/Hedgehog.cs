@@ -8,7 +8,7 @@ namespace BeardDefender_Monogame.GameObjects
         public Vector2 position;
         private Texture2D texture;
         private float speed = 150f;
-        private float detectionRange = 2000f; // Adjust this value to change the detection range
+        //private float detectionRange = 2000f; // Adjust this value to change the detection range
         private float scale;
         //private Vector2 lastPlayerPosition = Vector2.Zero;
 

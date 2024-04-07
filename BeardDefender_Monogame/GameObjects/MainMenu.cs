@@ -96,6 +96,7 @@ namespace BeardDefender_Monogame.GameObjects
             //// Ritar "Avsluta spelet"-val
             _spriteBatch.DrawString(buttonFont, "EXIT", new Vector2(618, 575), currentMenuOption == MenuOption.EXIT ? Color.Red : Color.Black);
         }
+
         // Get/Set
         public Texture2D Background1
         {
