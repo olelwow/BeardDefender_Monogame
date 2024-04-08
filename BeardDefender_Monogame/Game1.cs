@@ -247,6 +247,11 @@ namespace BeardDefender_Monogame
         }
         protected override void Update(GameTime gameTime)
         {
+            if(!File.Exists(filePath))
+            {
+                File.Create(filePath).Close();
+                File.WriteAllText(filePath, "Score: 0");
+            }
             if ( MediaPlayer.State != MediaState.Playing )
             {
                 MediaPlayer.Play(backgroundMusic);
