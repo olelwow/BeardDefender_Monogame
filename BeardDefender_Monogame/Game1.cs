@@ -12,9 +12,6 @@ using Microsoft.Xna.Framework.Content;
 using System;
 using System.IO;
 using BeardDefender_Monogame.GameLevels;
-using System.Diagnostics.Metrics;
-using System.Text.RegularExpressions;
-
 
 namespace BeardDefender_Monogame
 {

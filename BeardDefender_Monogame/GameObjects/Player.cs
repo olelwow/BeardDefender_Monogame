@@ -6,8 +6,6 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Numerics;
-using System.Text.RegularExpressions;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace BeardDefender_Monogame.GameObjects
