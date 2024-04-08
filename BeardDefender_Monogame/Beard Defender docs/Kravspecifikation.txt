@@ -1,0 +1,25 @@
+﻿BeardDefender
+
+Ramverk: Monogame
+
+Genre: 2D PlatormSpel
+
+Utvecklingsteam:
+Rasmus Broman, Jonas Öhrn, Nikolaos Prevenios, 
+Ahmed Dirie, Olle Ristenstrand
+
+Kravspecifikation
+Exakt vilket spel och hur det skall se ut skall beskrivas i kravspecifikationen.
+ 
+Kravspecifikationen skall innehålla en beskrivning av projektet i en flödande text (och allra helst med en eller flera bilder). Detta utgör er vision över det färdiga systemet. Därefter skall ett antal konkreta krav följa (i tabellform). Det är då viktigt att kraven är tydliga, verifierbara, numrerade och prioriterade. Kraven måste också minst täcka de minimikrav som vi har på projektarbetet. Kravspecifikationen skall skickas som en PDF-fil via Learnpoint. Kravspecen ska också läggas upp i erat github-projekt så att det blir lätt för er, och mig att gå tillbaka och kolla kraven.
+
+Minimikrav - Funktionella
+•	Projektet skall bestå av ett 1-spelarspel med grafiskt gränsnitt.
+•	Gränssnittet skall styras med tangentbord och/eller mus. Det är inte krav på att båda ska användads.
+•	Spelet skall ha en "meny", med några alternativ (t.ex. "nytt spel", "highscore" och "avsluta").
+•	Spelet skall åtminstone ha två "banor", minst två olika typer av "fiender" och minst två olika typer av "power-ups". För att det ska räknas måste funktionaliteten skilja. Ex: Ett monster jagar spelaren, det andra rör sig slumpmässigt, en powerup get poäng medan en annan ger extra liv. Det måste alltså skilja tillräckligt för att motivera att det ska vara två olika klasser.
+•	Spelet skall lagra poäng från tidigare spel i en "highscore" eller liknande. Detta måste lagras på datorns hårddisk.
+Minimikrav - Konceptuella
+•	Projektet skall göras objektorienterat och vara skrivet i C#.
+•	Projektet skall versionshanteras med Git.
+
