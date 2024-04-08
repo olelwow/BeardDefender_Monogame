@@ -1,0 +1,13 @@
+﻿Kompilerings Instruktioner
+
+Spelet börjar med filen Game1.cs där skapas variabler för spelet. Sen körs i ordning de core-metoder i Game1.cs. 
+
+Initialize() ”aktiverar” variablerna och sätter positioner till dem. 
+
+LoadContent () laddar upp texturer till alla objekt, fonts och bakgrundsmusik. 
+
+I Update () avgöras vilken scen ska köras till exempel Main Menu, Play osv. Varje val leder till en scen där varje objekts beteende och egenskaper uppdateras. 
+
+Objektens beteende, textur och egenskaper uppdateras i deras respektive klass.
+
+Slutningen Draw() ansvarar för att rita upp alla objekt.
