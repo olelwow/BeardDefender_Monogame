@@ -45,6 +45,12 @@ namespace BeardDefender_Monogame.GameObjects.Powerups
         }
         public void Update(GameTime gameTime, Player player)
         {
+            if (player.HP == 0)
+            {
+                hpBar[healthPosition1] = emptyHeart;
+                hpBar[healthPosition2] = emptyHeart;
+                hpBar[healthPosition3] = emptyHeart;
+            }
             if (player.HP == 1)
             {
                 hpBar[healthPosition1] = fullHeart;

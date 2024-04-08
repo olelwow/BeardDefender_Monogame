@@ -35,6 +35,7 @@ namespace BeardDefender_Monogame.GameObjects.Powerups
         public override void Use(Player player)
         {
             this.Taken = true;
+            player.MaxJumpTime += 0.25f;
         }
     }
 }

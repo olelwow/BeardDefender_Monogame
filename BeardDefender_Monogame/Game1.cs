@@ -82,6 +82,8 @@ namespace BeardDefender_Monogame
 
         // Unit objects
         Shark shark;
+        Shark shark2;
+        List<Shark> sharkList;
         Hedgehog hedgehog;
         Crabman crabman;
         //Player object
@@ -123,14 +125,19 @@ namespace BeardDefender_Monogame
             deathScene = new DeathScene();
             highscore = new Highscore();
             winnerScene = new WinnerScene();
+            shark = new(new Vector2(500, 600));
+            shark2 = new(new Vector2(300, 450));
+            sharkList = new() 
+            { 
+                shark,
+                shark2 
+            };
 
             background = new Background(1320, 0);
             background2 = new Background(1320, 0);
             //backgroundLeft = new Background(-1);
             //backgroundLeft2 = new Background(1320);
 
-
-            shark = new(new Vector2(100, 100));
             crabman = new Crabman();
             background = new Background(startX, GraphicsDevice.Viewport.Width);
             background2 = new Background(startX, GraphicsDevice.Viewport.Width);
@@ -251,7 +258,10 @@ namespace BeardDefender_Monogame
             crabman.LoadContent(Content);
 
             // Texturer för shark
-            shark.LoadContent(Content);
+            foreach (Shark shark in sharkList)
+            {
+                shark.LoadContent(Content);
+            }
 
             // Ground
             foreach (Ground ground in groundList)
@@ -305,16 +315,18 @@ namespace BeardDefender_Monogame
 
                             if (player.position.X <= crabman.PositionX + 125 && player.position.Y <= crabman.PositionY + 100)
                             {
-                                GameLevel.DeathByCrabman(gameTime, this, filePath);
+                                GameLevel.ResetGame(this, gameTime, filePath, player, healthCounter, powerUpList, sharkList);
                             }
 
                             if (levelTimer >= LevelTimeLimit)
                             {
-                                LevelOne.ChangeLevel(this, powerUpList);
+                                LevelOne.ChangeLevel(this, powerUpList, shark, shark2);
                             }
 
                             LevelOne.Update
-                                (keyboardState,
+                                (this,
+                                filePath,
+                                keyboardState,
                                 gameTime,
                                 this.GraphicsDevice,
                                 _graphics,
@@ -323,7 +335,7 @@ namespace BeardDefender_Monogame
                                 groundList,
                                 hedgehog,
                                 crabman,
-                                shark,
+                                sharkList,
                                 powerUpList,
                                 healthCounter);
                         }
@@ -341,31 +353,39 @@ namespace BeardDefender_Monogame
                             levelTimer += gameTime.ElapsedGameTime.TotalSeconds;
                             if (player.position.X <= crabman.PositionX + 125 && player.position.Y <= crabman.PositionY + 100)
                             {
-                                GameLevel.DeathByCrabman(gameTime, this, filePath);
+                                GameLevel.ResetGame(this, gameTime, filePath, player, healthCounter, powerUpList, sharkList);
                             }
                             if (levelTimer >= LevelTimeLimit)
                             {
-                                File.AppendAllText(filePath, $"\nScore: {((int)Math.Ceiling(score)).ToString()} points");
-                                activeScenes = Scenes.WIN;
-                                levelTimer = 0;
+                                GameLevel.ResetGame
+                                    (this,
+                                    gameTime,
+                                    filePath,
+                                    player,
+                                    healthCounter,
+                                    powerUpList,
+                                    sharkList);
+                                //File.AppendAllText(filePath, $"\nScore: {((int)Math.Ceiling(score)).ToString()} points");
+                                //activeScenes = Scenes.WIN;
+                                //levelTimer = 0;
 
-                                player.HP = 1;
+                                //player.HP = 1;
 
-                                healthCounter.Update(gameTime, player);
+                                //healthCounter.Update(gameTime, player);
 
-                                gemScore.Taken = false;
-                                heart.Taken = false;
-                                jumpBoost.Taken = false;
+                                //gemScore.Taken = false;
+                                //heart.Taken = false;
+                                //jumpBoost.Taken = false;
 
-                                gemScore.Position = new Rectangle(1200, 540, 60, 60);
-                                heart.Position = new Rectangle(900, 600, 60, 60);
-                                jumpBoost.Position = new Rectangle(700, 600, 60, 60);
-                                player.Position = new RectangleF(600, 400, 25, 36);
+                                //gemScore.Position = new Rectangle(1200, 540, 60, 60);
+                                //heart.Position = new Rectangle(900, 600, 60, 60);
+                                //jumpBoost.Position = new Rectangle(700, 600, 60, 60);
+                                //player.Position = new RectangleF(600, 400, 25, 36);
                             }
-
-
                             LevelTwo.Update
-                                (keyboardState,
+                                (this,
+                                filePath,
+                                keyboardState,
                                 gameTime,
                                 this.GraphicsDevice,
                                 _graphics,
@@ -374,7 +394,7 @@ namespace BeardDefender_Monogame
                                 groundList,
                                 hedgehog,
                                 crabman,
-                                shark,
+                                sharkList,
                                 powerUpList,
                                 healthCounter);
                         }
@@ -432,7 +452,7 @@ namespace BeardDefender_Monogame
                         powerUpList,
                         player,
                         crabman,
-                        shark,
+                        sharkList,
                         hedgehog,
                         healthCounter);
                     _spriteBatch.DrawString(levelfont, "Level 1", new Vector2(620, 20), Color.Black);
@@ -446,7 +466,7 @@ namespace BeardDefender_Monogame
                         powerUpList,
                         player,
                         crabman,
-                        shark,
+                        sharkList,
                         hedgehog,
                         healthCounter);
                     _spriteBatch.DrawString(levelfont, "Level 2", new Vector2(620, 20), Color.Black);

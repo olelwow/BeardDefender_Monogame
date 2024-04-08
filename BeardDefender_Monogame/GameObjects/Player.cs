@@ -31,7 +31,7 @@ namespace BeardDefender_Monogame.GameObjects
         private const float MaxMoveSpeed = 200.0f; // Minskad för lägre maxhastighet
         private const float GroundDragFactor = 0.58f;
         private const float AirDragFactor = 0.65f;
-        private const float MaxJumpTime = 0.25f; // Justera för att påverka hur länge spelaren kan påverka hoppet uppåt
+        private float maxJumpTime = 0.25f; // Justera för att påverka hur länge spelaren kan påverka hoppet uppåt
         private const float JumpLaunchVelocity = -1000.0f; // Högre värde för högre hopp
         private const float GravityAcceleration = 1500.0f; // Öka för snabbare fall, minska för långsammare
         private const float MaxFallSpeed = 550.0f; // Justera max fallhastighet
@@ -45,8 +45,8 @@ namespace BeardDefender_Monogame.GameObjects
             this.position = position;
             this.velocity = position;
         }
-        
-        public void LoadContent (ContentManager Content)
+
+        public void LoadContent(ContentManager Content)
         {
             this.idleAnimation = new Animation(Content.Load<Texture2D>("Idle-Left"), 0.1f, true);
             this.runAnimation = new Animation(Content.Load<Texture2D>("Run-LEFT"), 0.1f, true);
@@ -56,10 +56,10 @@ namespace BeardDefender_Monogame.GameObjects
         }
 
         public bool MovePlayer(
-            KeyboardState keyboardState, 
+            KeyboardState keyboardState,
             GameTime gameTime,
             Hedgehog hedgehog,
-            List<Ground> groundList, 
+            List<Ground> groundList,
             PowerUp jumpBoosts
             )
         {
@@ -189,7 +189,7 @@ namespace BeardDefender_Monogame.GameObjects
             {
                 isJumping = false;
             }
-            
+
         }
 
         public void DrawPlayer(SpriteBatch _spriteBatch)
@@ -216,6 +216,11 @@ namespace BeardDefender_Monogame.GameObjects
         }
 
         // Get/Set
+        public float MaxJumpTime
+        {
+            get { return maxJumpTime; }
+            set { maxJumpTime = value; }
+        }
         public int HP
         {
             get { return hP; }
