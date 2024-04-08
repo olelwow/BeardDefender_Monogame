@@ -57,6 +57,9 @@ namespace BeardDefender_Monogame
         // MainMenu object
         MainMenu mainmenu;
 
+        //Level Font
+        SpriteFont levelfont;
+
         //Highscore object
         Highscore highscore;
 
@@ -210,7 +213,10 @@ namespace BeardDefender_Monogame
             ScoreFont = Content.Load<SpriteFont>("ScoreFont");
 
             //Laddar textur för hp box.
-            healthCounter.LoadContent(Content); 
+            healthCounter.LoadContent(Content);
+
+            //Laddar för level nummer
+            levelfont = Content.Load<SpriteFont>("LevelFont");
 
             //laddar texturer för Highscore
             highscore.LoadContent(Content);
@@ -405,6 +411,7 @@ namespace BeardDefender_Monogame
                         shark,
                         hedgehog,
                         healthCounter);
+                    _spriteBatch.DrawString(levelfont, "Level 1", new Vector2(620, 20), Color.Black);
                 break;
 
                 case Scenes.LEVEL_TWO:
@@ -418,7 +425,8 @@ namespace BeardDefender_Monogame
                         shark,
                         hedgehog,
                         healthCounter);
-                break;
+                    _spriteBatch.DrawString(levelfont, "Level 2", new Vector2(620, 20), Color.Black);
+                    break;
 
                 case Scenes.HIGHSCORE:
                     highscore.DrawBackground(_spriteBatch, MapWidth, MapHeight);

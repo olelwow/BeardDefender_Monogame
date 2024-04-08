@@ -28,7 +28,8 @@ namespace BeardDefender_Monogame
             this.textureArray = new Texture2D[4];
         }
 
-        public void LoadContent(ContentManager Content)
+        
+            public void LoadContent(ContentManager Content)
         {
             //Hämtar in respektive bild i variabler.
 
