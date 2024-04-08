@@ -8,17 +8,24 @@ using System.Collections.Generic;
 using static System.Formats.Asn1.AsnWriter;
 using System.Numerics;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
+using Microsoft.Xna.Framework.Content;
 
 namespace BeardDefender_Monogame.GameLevels
 {
     internal abstract class LevelOne
     {
+        private SpriteFont levelfont;
         private static Rectangle[] powerUpPositions = new Rectangle[3] 
         {   
             new Rectangle(250, 400, 60, 60),
             new Rectangle(700, 520, 60, 60),
             new Rectangle(1200, 340, 60, 60) 
         };
+
+        public void LoadContent(ContentManager Content)
+        {
+            levelfont = Content.Load<SpriteFont>("LevelFont");
+        }
         public static void Update (
             KeyboardState keyboardState,
             GameTime gameTime,
