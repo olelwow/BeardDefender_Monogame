@@ -12,6 +12,8 @@ using Microsoft.Xna.Framework.Content;
 using System;
 using System.IO;
 using BeardDefender_Monogame.GameLevels;
+using System.Diagnostics.Metrics;
+using System.Text.RegularExpressions;
 
 
 namespace BeardDefender_Monogame
@@ -132,13 +134,10 @@ namespace BeardDefender_Monogame
                 shark,
                 shark2 
             };
-
-            background = new Background(1320, 0);
-            background2 = new Background(1320, 0);
-            //backgroundLeft = new Background(-1);
-            //backgroundLeft2 = new Background(1320);
-
             crabman = new Crabman();
+            hedgehog = new Hedgehog(new Vector2(400, 640 - 50), Content.Load<Texture2D>("Hedgehog_Right"), 0.03f);
+
+            // Background
             background = new Background(startX, GraphicsDevice.Viewport.Width);
             background2 = new Background(startX, GraphicsDevice.Viewport.Width);
             backgroundList = new()
@@ -157,42 +156,16 @@ namespace BeardDefender_Monogame
                 jumpBoost,
                 gemScore,
             };
+
+            // UI
             healthCounter = new(new Vector2(1070, 15));
             ScoreBoxPosition = new Vector2(0, 15);
+
             player = new Player(new RectangleF(600, 400, 25, 36));
 
             // Obstacle/Ground. Kunde inte använda texturens Height/Width värden här,
             // 80 representerar Height, width är 640. Får klura ut hur man skulle kunna göra annars.
-            groundLower = new(new RectangleF(
-                0,
-                _graphics.PreferredBackBufferHeight - 80,
-                _graphics.PreferredBackBufferWidth / 2,
-                80));
-
-            groundLower2 = new(new RectangleF(
-                groundLower.Position.Right - 20,
-                _graphics.PreferredBackBufferHeight - 80,
-                640 + 20,
-                80));
-
-            groundLower3 = new(new RectangleF(
-                groundLower2.Position.Right - 20,
-                _graphics.PreferredBackBufferHeight - 80,
-                groundLower2.Position.Width,
-                groundLower2.Position.Height));
-
-            groundLower4 = new(new RectangleF(
-                groundLower3.Position.Right - 20,
-                _graphics.PreferredBackBufferHeight - 80,
-                groundLower3.Position.Width,
-                groundLower3.Position.Height));
-
-            groundLower5 = new(new RectangleF(
-                groundLower4.Position.Right - 20,
-                _graphics.PreferredBackBufferHeight - 80,
-                groundLower4.Position.Width,
-                groundLower4.Position.Height));
-
+            int valueX = 640;
             groundList = new()
             {
                 groundLower,
@@ -201,8 +174,14 @@ namespace BeardDefender_Monogame
                 groundLower4,
                 groundLower5,
             };
-
-            hedgehog = new Hedgehog(new Vector2(400, groundLower.Position.Y - 50), Content.Load<Texture2D>("Hedgehog_Right"), 0.03f);
+            for (int i = 0; i < groundList.Count; i++)
+            {
+                groundList[i] = new(new RectangleF(
+                        valueX * i,
+                        640,
+                        660,
+                        80));
+            }
             base.Initialize();
         }
         protected override void LoadContent()
@@ -223,12 +202,6 @@ namespace BeardDefender_Monogame
             {
                 background.LoadContent(Content);
             }
-
-            background.LoadContent(Content);
-            background2.LoadContent(Content);
-            //backgroundLeft.LoadContent(Content);
-            //backgroundLeft2.LoadContent(Content);
-
 
             //Laddar texturer för deathscene
             deathScene.LoadContent(Content);
@@ -315,7 +288,15 @@ namespace BeardDefender_Monogame
 
                             if (player.position.X <= crabman.PositionX + 125 && player.position.Y <= crabman.PositionY + 100)
                             {
-                                GameLevel.ResetGame(this, gameTime, filePath, player, healthCounter, powerUpList, sharkList);
+                                player.HP = 0;
+                                GameLevel.ResetGame
+                                    (this,
+                                    gameTime,
+                                    filePath,
+                                    player,
+                                    healthCounter,
+                                    powerUpList,
+                                    sharkList);
                             }
 
                             if (levelTimer >= LevelTimeLimit)
@@ -353,6 +334,7 @@ namespace BeardDefender_Monogame
                             levelTimer += gameTime.ElapsedGameTime.TotalSeconds;
                             if (player.position.X <= crabman.PositionX + 125 && player.position.Y <= crabman.PositionY + 100)
                             {
+                                player.HP = 0;
                                 GameLevel.ResetGame(this, gameTime, filePath, player, healthCounter, powerUpList, sharkList);
                             }
                             if (levelTimer >= LevelTimeLimit)
@@ -365,22 +347,6 @@ namespace BeardDefender_Monogame
                                     healthCounter,
                                     powerUpList,
                                     sharkList);
-                                //File.AppendAllText(filePath, $"\nScore: {((int)Math.Ceiling(score)).ToString()} points");
-                                //activeScenes = Scenes.WIN;
-                                //levelTimer = 0;
-
-                                //player.HP = 1;
-
-                                //healthCounter.Update(gameTime, player);
-
-                                //gemScore.Taken = false;
-                                //heart.Taken = false;
-                                //jumpBoost.Taken = false;
-
-                                //gemScore.Position = new Rectangle(1200, 540, 60, 60);
-                                //heart.Position = new Rectangle(900, 600, 60, 60);
-                                //jumpBoost.Position = new Rectangle(700, 600, 60, 60);
-                                //player.Position = new RectangleF(600, 400, 25, 36);
                             }
                             LevelTwo.Update
                                 (this,
