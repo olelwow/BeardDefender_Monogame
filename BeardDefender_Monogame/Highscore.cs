@@ -1,10 +1,8 @@
-﻿using BeardDefender_Monogame.GameObjects;
-using Microsoft.Xna.Framework.Content;
+﻿using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using System.IO;
 using System;
-using System.Collections.Immutable;
 
 namespace BeardDefender_Monogame
 {

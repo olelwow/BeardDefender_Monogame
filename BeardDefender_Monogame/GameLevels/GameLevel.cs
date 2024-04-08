@@ -22,35 +22,6 @@ namespace BeardDefender_Monogame.GameLevels
             game.LastPlayedLevel = game.ActiveScenes;
             game.ActiveScenes = Scenes.MAIN_MENU;
         }
-        //public static void DeathByCrabman (
-        //    GameTime gameTime,
-        //    Game1 game,
-        //    string filePath,
-        //    List<PowerUp> powerUpList,
-        //    Player player,
-        //    HealthCounter healthCounter,
-        //    List<Shark> sharkList)
-        //{
-        //    //File.AppendAllText(filePath, $"\nScore: {((int)Math.Ceiling(Game1.score)).ToString()} points");
-        //    //game.ActiveScenes = 
-        //    //                    Scenes.DEATH;
-
-
-        //    //// Återställer allt till "0" för att kunna påbörja nytt spel
-        //    //game.LevelTimer = 0;
-        //    //game.player.HP = 1;
-        //    //game.healthCounter.Update(gameTime, game.player);
-        //    //int counter = 0;
-        //    //foreach (PowerUp powerUp in powerUpList) 
-        //    //{
-        //    //    powerUp.Taken = false;
-        //    //    powerUp.Position = powerUpPositions[counter];
-        //    //    counter++;
-        //    //}
-
-        //    //game.player.Position = new RectangleF(600, 400, 25, 36);
-        //    ResetGame(game, gameTime, filePath, player, healthCounter, powerUpList, sharkList);
-        //}
         public static void ResetGame(
             Game1 game,
             GameTime gameTime,
