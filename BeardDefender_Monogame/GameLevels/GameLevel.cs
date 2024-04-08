@@ -76,8 +76,10 @@ namespace BeardDefender_Monogame.GameLevels
             }
             sharkList[0].Position = new Vector2(500, 600);
             sharkList[0].DrawShark = true;
+            sharkList[0].SharkIsLeft = false;
             sharkList[1].Position = new Vector2(300, 450);
             sharkList[1].DrawShark = true;
+            sharkList[1].SharkIsLeft = false;
             player.Position = new RectangleF(600, 400, 25, 36);
         }
     }

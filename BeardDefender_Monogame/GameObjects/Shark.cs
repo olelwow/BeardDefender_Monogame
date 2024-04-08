@@ -153,6 +153,7 @@ namespace BeardDefender_Monogame.GameObjects
         public bool SharkIsLeft
         {
             get { return sharkIsLeft; }
+            set {  sharkIsLeft = value; }
         }
         public Texture2D[] TextureLeft
         {
