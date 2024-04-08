@@ -38,25 +38,35 @@ namespace BeardDefender_Monogame
             int vertical = MapHeight / 2 - 200;
             _spriteBatch.Draw(highscorebackground, destinationRectangle, Color.White);
             _spriteBatch.Draw(ScoreBackground, new Vector2(900, 155), Color.White);
-            // Try catch med meddelande ifall highscore-filen inte skapats än
-            try
-            {
-                // Försök läsa highscore-fil
-                string[] lines = File.ReadAllLines(
+
+            // Läsa highscore-fil
+            string[] lines = File.ReadAllLines(
                     Path.Combine(
                         Environment.GetFolderPath(
                             Environment.SpecialFolder.Desktop),
                             "Game highscore.txt"));
 
-                for (int i = 0; i < lines.Length; i++)
+            if (lines == null
+                || lines.Length == 0)
+            {
+                // Meddela ifall filen inte finns
+                string message = "        No highscore available.\n\n      What are you waiting for\n             BeardDefender?\n\n       GO PLAY THE GAME!!!";
+                _spriteBatch.DrawString(spriteFont, message, new Vector2(MapWidth / 2 + 160, vertical), Color.Red);
+            }
+            else
+            {
+                if (lines.Length > 1)
                 {
-                    for (int j = i + 1; j < lines.Length; j++)
+                    for (int i = 0; i < lines.Length; i++)
                     {
-                        if (int.Parse(lines[j].Split(' ')[1]) > int.Parse(lines[i].Split(' ')[1]))
+                        for (int j = i + 1; j < lines.Length; j++)
                         {
-                            string temp = lines[i];
-                            lines[i] = lines[j];
-                            lines[j] = temp;
+                            if (int.Parse(lines[j].Split(' ')[1]) > int.Parse(lines[i].Split(' ')[1]))
+                            {
+                                string temp = lines[i];
+                                lines[i] = lines[j];
+                                lines[j] = temp;
+                            }
                         }
                     }
                 }
@@ -81,14 +91,7 @@ namespace BeardDefender_Monogame
                         // Justera för nästa rad
                         vertical += 35;
                     }
-                }   
-                
-            }
-            catch (FileNotFoundException)
-            {
-                // Meddela ifall filen inte finns
-                string message = "             No highscore available.\n\nWhat are you waiting for BeardDefender?\n\n              GO PLAY THE GAME!!!";
-                _spriteBatch.DrawString(spriteFont, message, new Vector2(MapWidth / 2 - spriteFont.MeasureString(message).X / 2, vertical), Color.Red);
+                }
             }
         }
 
