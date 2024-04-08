@@ -1,5 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using BeardDefender_Monogame.GameObjects.Powerups;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
 
 namespace BeardDefender_Monogame.GameObjects
 {
@@ -10,6 +12,14 @@ namespace BeardDefender_Monogame.GameObjects
         // Universal Draw metod.
         public virtual void Draw(SpriteBatch spriteBatch) { }
         // Update metod för Shark.
-        public virtual int Update(GraphicsDeviceManager _graphics, GameTime gameTime) { return 0; }
+        public virtual int Update(
+            GraphicsDeviceManager _graphics,
+            GameTime gameTime,
+            Player player,
+            Game1 game,
+            string filePath,
+            List<PowerUp> powerUpList,
+            List<Shark> sharkList,
+            HealthCounter healthCounter) { return 0; }
     }
 }

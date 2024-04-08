@@ -3,10 +3,7 @@ using BeardDefender_Monogame.GameObjects;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
-using System;
 using System.Collections.Generic;
-using static System.Formats.Asn1.AsnWriter;
-using System.Numerics;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 using Microsoft.Xna.Framework.Content;
 
@@ -27,6 +24,8 @@ namespace BeardDefender_Monogame.GameLevels
             levelfont = Content.Load<SpriteFont>("LevelFont");
         }
         public static void Update (
+            Game1 game,
+            string filePath,
             KeyboardState keyboardState,
             GameTime gameTime,
             GraphicsDevice graphicsDevice,
@@ -36,7 +35,7 @@ namespace BeardDefender_Monogame.GameLevels
             List<Ground> groundList,
             Hedgehog hedgehog,
             Crabman crabman,
-            Shark shark,
+            List<Shark> sharkList,
             List<PowerUp> powerUpList,
             HealthCounter healthCounter)
         {
@@ -54,7 +53,6 @@ namespace BeardDefender_Monogame.GameLevels
                 }
             }
             // Uppdatera spelarposition, fiender, osv.
-            //player.position.Y = groundList[0].Position.Y - (player.Texture.Height / 4);
             foreach (Ground ground in groundList)
             {
                 ground.Update(gameTime, graphicsDevice.Viewport.Width);
@@ -70,10 +68,14 @@ namespace BeardDefender_Monogame.GameLevels
                     (JumpBoost)powerUpList[1]);
 
             //returnerar rätt frame index som används i Update.
-            crabman.CurrentFrameIndex = crabman.Update(_graphics, gameTime);
+            crabman.CurrentFrameIndex = crabman.Update(_graphics, gameTime, player, game, filePath, powerUpList, sharkList, healthCounter);
 
             // Shark movement, returnerar rätt frame index som används i Update.
-            shark.CurrentFrameIndex = shark.Update(_graphics, gameTime);
+            
+            foreach (Shark shark in sharkList)
+            {
+                shark.CurrentFrameIndex = shark.Update(_graphics, gameTime, player, game, filePath, powerUpList, sharkList, healthCounter);
+            }
 
             //Updaterar score i sammaband med spelets timer
             Game1.score += (double)gameTime.ElapsedGameTime.TotalSeconds;
@@ -95,7 +97,7 @@ namespace BeardDefender_Monogame.GameLevels
             List<PowerUp> powerUpList,
             Player player,
             Crabman crabman,
-            Shark shark,
+            List<Shark> sharkList,
             Hedgehog hedgehog,
             HealthCounter healthCounter)
         {
@@ -113,7 +115,13 @@ namespace BeardDefender_Monogame.GameLevels
 
             // SHAAAARKs draw metod sköter animationer beroende på åt vilket håll hajen rör sig.
             crabman.Draw(_spriteBatch);
-            shark.Draw(_spriteBatch);
+            foreach (Shark shark in sharkList)
+            {
+                if (shark.DrawShark)
+                {
+                    shark.Draw(_spriteBatch);
+                }
+            }
             hedgehog.Draw(_spriteBatch);
 
             //Ground
@@ -131,7 +139,7 @@ namespace BeardDefender_Monogame.GameLevels
             }
             healthCounter.Draw(_spriteBatch);
         }
-        public static void ChangeLevel (Game1 game, List<PowerUp> powerUpList)
+        public static void ChangeLevel (Game1 game, List<PowerUp> powerUpList, Shark shark, Shark shark2)
         {
             game.ActiveScenes = Scenes.LEVEL_TWO;
             game.LevelTimer = 0;
@@ -143,6 +151,10 @@ namespace BeardDefender_Monogame.GameLevels
                 powerUp.Position = powerUpPositions[counter];
                 counter++;
             }
+            shark.Position = new Vector2(500, 600);
+            shark.DrawShark = true;
+            shark2.Position = new Vector2(300, 450);
+            shark2.DrawShark = true;
         }
     }
 }

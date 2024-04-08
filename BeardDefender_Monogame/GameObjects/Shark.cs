@@ -1,6 +1,11 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
+using System.Drawing;
+using Color = Microsoft.Xna.Framework.Color;
+using BeardDefender_Monogame.GameLevels;
+using System.Collections.Generic;
+using BeardDefender_Monogame.GameObjects.Powerups;
 
 namespace BeardDefender_Monogame.GameObjects
 {
@@ -15,6 +20,7 @@ namespace BeardDefender_Monogame.GameObjects
         int currentFrameIndex; // Variabel som väljer vilken frame man tar ur arrayen.
         float frameDuration = 0.2f; // Hastighet på animationen.
         float frameTimer = 0f;
+        private bool drawShark;
 
         public Shark(Vector2 position)
         {
@@ -23,6 +29,7 @@ namespace BeardDefender_Monogame.GameObjects
             // Array MÅSTE intieras innan man försöker lägga in textures i den.
             textureLeft = new Texture2D[2];
             textureRight = new Texture2D[2];
+            drawShark = true;
         }
 
         // Laddar in bilder till Shark objektet.
@@ -36,7 +43,15 @@ namespace BeardDefender_Monogame.GameObjects
         }
         // Denna metod räknar ut vilken frame man är på, och sköter hajens movement mellan vissa punkter.
         // Returnerar en int som representerar frame index.
-        public override int Update(GraphicsDeviceManager _graphics, GameTime gameTime)
+        public override int Update(
+            GraphicsDeviceManager _graphics,
+            GameTime gameTime,
+            Player player,
+            Game1 game,
+            string filePath,
+            List<PowerUp> powerUpList,
+            List<Shark> sharkList,
+            HealthCounter healthCounter)
         {
             // Uppdatera frameTimer
             frameTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -73,6 +88,20 @@ namespace BeardDefender_Monogame.GameObjects
                     position.X = _graphics.PreferredBackBufferWidth - texture.Width / 2;
                     sharkIsLeft = false;
                 }
+            }
+            RectangleF sharkPos = new RectangleF(this.Position.X, this.Position.Y, this.Texture.Height, this.Texture.Width);
+
+            if (player.Position.IntersectsWith(sharkPos))
+            {
+                player.HP--;
+                drawShark = false;
+                sharkPos = new RectangleF(100, 100, 100, 100);
+                this.position.X = 0;
+                this.position.Y = 0;
+            }
+            if (player.HP < 1)
+            {
+                GameLevel.ResetGame(game, gameTime, filePath, player, healthCounter, powerUpList, sharkList);
             }
             return currentFrameIndex;
         }
@@ -111,6 +140,11 @@ namespace BeardDefender_Monogame.GameObjects
         }
         
         // Get/Set
+        public bool DrawShark
+        {
+            get { return drawShark; }
+            set { drawShark = value; }
+        }
         public int CurrentFrameIndex
         {
             get { return currentFrameIndex; }
@@ -138,7 +172,8 @@ namespace BeardDefender_Monogame.GameObjects
         public Vector2 Position
         {
             get { return position; }
-            set { position = value; }
+            set { position.X = value.X;
+                  position.Y = value.Y; }
         }
         public float Speed
         {

@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using BeardDefender_Monogame.GameObjects.Powerups;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -38,7 +39,15 @@ namespace BeardDefender_Monogame.GameObjects
             this.CurrentTexture = this.TextureArray[0];
         }
 
-        public override int Update(GraphicsDeviceManager _graphics, GameTime gameTime)
+        public override int Update
+            (GraphicsDeviceManager _graphics,
+            GameTime gameTime,
+            Player player,
+            Game1 game,
+            string filePath,
+            List<PowerUp> powerUpList,
+            List<Shark> sharkList,
+            HealthCounter healthCounter)
         {
             // Uppdatera frameTimer
             frameTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
