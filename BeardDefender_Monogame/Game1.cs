@@ -73,7 +73,12 @@ namespace BeardDefender_Monogame
         //Background object
         Background background;
         Background background2;
+
         List<Background> backgroundList;
+
+        Background backgroundLeft;
+        Background backgroundLeft2;
+
 
         // Unit objects
         Shark shark;
@@ -118,6 +123,13 @@ namespace BeardDefender_Monogame
             deathScene = new DeathScene();
             highscore = new Highscore();
             winnerScene = new WinnerScene();
+
+            background = new Background(1320, 0);
+            background2 = new Background(1320, 0);
+            //backgroundLeft = new Background(-1);
+            //backgroundLeft2 = new Background(1320);
+
+
             shark = new(new Vector2(100, 100));
             crabman = new Crabman();
             background = new Background(startX, GraphicsDevice.Viewport.Width);
@@ -199,10 +211,17 @@ namespace BeardDefender_Monogame
             mainmenu.LoadContent(Content);
 
             //Laddar texturer för Background.
+
             foreach (Background background in backgroundList)
             {
                 background.LoadContent(Content);
             }
+
+            background.LoadContent(Content);
+            background2.LoadContent(Content);
+            //backgroundLeft.LoadContent(Content);
+            //backgroundLeft2.LoadContent(Content);
+
 
             //Laddar texturer för deathscene
             deathScene.LoadContent(Content);
@@ -240,19 +259,19 @@ namespace BeardDefender_Monogame
                 ground.LoadContent(Content);
             }
             // Powerupzzz
-            foreach(PowerUp powerUp in powerUpList)
+            foreach (PowerUp powerUp in powerUpList)
             {
                 powerUp.LoadContent(Content);
             }
         }
         protected override void Update(GameTime gameTime)
         {
-            if(!File.Exists(filePath))
+            if (!File.Exists(filePath))
             {
                 File.Create(filePath).Close();
                 File.WriteAllText(filePath, "Score: 0");
             }
-            if ( MediaPlayer.State != MediaState.Playing )
+            if (MediaPlayer.State != MediaState.Playing)
             {
                 MediaPlayer.Play(backgroundMusic);
             }
@@ -263,7 +282,7 @@ namespace BeardDefender_Monogame
             menuSceneChangeTimeDelay += gameTime.ElapsedGameTime.TotalSeconds;
 
             // Tillåt ändring efter en halv sekund
-            if (menuSceneChangeTimeDelay >= 0.5) 
+            if (menuSceneChangeTimeDelay >= 0.5)
             {
                 switch (activeScenes)
                 {
@@ -403,7 +422,7 @@ namespace BeardDefender_Monogame
             {
                 case Scenes.MAIN_MENU:
                     mainmenu.DrawMainMenu(_spriteBatch, MapWidth, MapHeight);
-                break;
+                    break;
 
                 case Scenes.LEVEL_ONE:
                     LevelOne.Draw(
@@ -417,7 +436,7 @@ namespace BeardDefender_Monogame
                         hedgehog,
                         healthCounter);
                     _spriteBatch.DrawString(levelfont, "Level 1", new Vector2(620, 20), Color.Black);
-                break;
+                    break;
 
                 case Scenes.LEVEL_TWO:
                     LevelTwo.Draw(
@@ -435,17 +454,17 @@ namespace BeardDefender_Monogame
 
                 case Scenes.HIGHSCORE:
                     highscore.DrawBackground(_spriteBatch, MapWidth, MapHeight);
-                break;
+                    break;
 
                 case Scenes.WIN:
                     winnerScene.DrawBackground(_spriteBatch, MapWidth, MapHeight, score);
-                break;
+                    break;
 
                 case Scenes.DEATH:
                     deathScene.DrawBackground(_spriteBatch, MapWidth, MapHeight, score);
                     _spriteBatch.DrawString(deathtext, "ME CRABMAN!! I EAT YOU!!!", new Vector2(140, 470), Color.Black);
                     _spriteBatch.DrawString(ScoreFont, "Score: " + ((int)score).ToString(), new Vector2(600, 560), Color.Black); //position är hardkodat...
-                break;
+                    break;
             }
             _spriteBatch.End();
             base.Draw(gameTime);
