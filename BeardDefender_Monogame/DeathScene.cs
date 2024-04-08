@@ -81,7 +81,7 @@ namespace BeardDefender_Monogame
                     SpriteEffects.None,
                     0f);
 
-            _spriteBatch.DrawString(scoreFont, "Score: " + ((int)score).ToString(), new Vector2(0, 0), Color.Black);
+            
         }
 
         // Get/Set

@@ -77,8 +77,7 @@ namespace BeardDefender_Monogame.GameObjects
             {
                 currentAnimation = runAnimation;
             }
-            else if (keyboardState.IsKeyDown(Keys.Space)
-                || !isOnGround)
+            else if (keyboardState.IsKeyDown(Keys.Space))
             {
                 currentAnimation = jumpAnimation;
             }
