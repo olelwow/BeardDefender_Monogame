@@ -54,14 +54,15 @@ namespace BeardDefender_Monogame.GameLevels
                     (JumpBoost)powerUpList[1]);
 
             //returnerar rätt frame index som används i Update.
-            crabman.CurrentFrameIndex = crabman.Update(_graphics, gameTime, player, game, filePath, powerUpList, sharkList, healthCounter);
+            crabman.CurrentFrameIndex = crabman.Update(_graphics, gameTime, player, game, filePath, powerUpList, sharkList, hedgehog, healthCounter);
 
             // Shark movement, returnerar rätt frame index som används i Update.
             foreach (Shark shark in sharkList)
             {
-                shark.CurrentFrameIndex = shark.Update(_graphics, gameTime, player, game, filePath, powerUpList, sharkList, healthCounter);
+                shark.CurrentFrameIndex = shark.Update(_graphics, gameTime, player, game, filePath, powerUpList, sharkList, hedgehog, healthCounter);
             }
 
+            hedgehog.CurrentFrameIndex = hedgehog.Update(_graphics, gameTime, player, game, filePath, powerUpList, sharkList, hedgehog, healthCounter);
 
             //Updaterar score i sammaband med spelets timer
             Game1.score += (double)gameTime.ElapsedGameTime.TotalSeconds;

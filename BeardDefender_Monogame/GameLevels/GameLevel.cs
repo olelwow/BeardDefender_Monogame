@@ -29,9 +29,10 @@ namespace BeardDefender_Monogame.GameLevels
             Player player,
             HealthCounter healthCounter,
             List<PowerUp> powerUpList,
-            List<Shark> sharkList)
+            List<Shark> sharkList,
+            Hedgehog hedgehog)
         {
-            File.AppendAllText(filePath, $"\nScore: {((int)Math.Ceiling(Game1.score)).ToString()} points");
+            File.AppendAllText(filePath, $"\nScore: {((int)Math.Ceiling(Game1.score + (player.HP * 10))).ToString()} points");
             game.ActiveScenes = player.HP > 0 ? Scenes.WIN : Scenes.DEATH;
             game.LevelTimer = 0;
             player.HP = 1;
@@ -51,6 +52,7 @@ namespace BeardDefender_Monogame.GameLevels
             sharkList[1].Position = new Vector2(300, 450);
             sharkList[1].DrawShark = true;
             sharkList[1].SharkIsLeft = false;
+            hedgehog.position = new Vector2(100, 620);
             player.Position = new RectangleF(600, 400, 25, 36);
         }
     }

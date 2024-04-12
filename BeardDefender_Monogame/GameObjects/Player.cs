@@ -82,7 +82,7 @@ namespace BeardDefender_Monogame.GameObjects
             else
             {
                 currentAnimation = idleAnimation;
-                this.position.X -= 1;
+                //this.position.X -= 1;
             }
             return isFacingRight;
         }
@@ -112,6 +112,7 @@ namespace BeardDefender_Monogame.GameObjects
                     {
                         isOnGround = true;
                         velocity.Y = 0;
+                        velocity.X = 0;
                         position.Y = groundTop - (texture.Height / 4);
                     }
                 }

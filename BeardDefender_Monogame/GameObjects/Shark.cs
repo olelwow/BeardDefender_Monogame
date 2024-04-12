@@ -21,6 +21,7 @@ namespace BeardDefender_Monogame.GameObjects
         float frameDuration = 0.2f; // Hastighet på animationen.
         float frameTimer = 0f;
         private bool drawShark;
+        private bool sharkIsGoingUp = true;
 
         public Shark(Vector2 position)
         {
@@ -51,6 +52,7 @@ namespace BeardDefender_Monogame.GameObjects
             string filePath,
             List<PowerUp> powerUpList,
             List<Shark> sharkList,
+            Hedgehog hedgehog,
             HealthCounter healthCounter)
         {
             // Uppdatera frameTimer
@@ -64,44 +66,65 @@ namespace BeardDefender_Monogame.GameObjects
                 frameTimer = 0f;
             }
 
-            // Kollar om shark inte är till vänster, och på rätt position av skärmen. När shark har kommit
-            // hela vägen till vänster ändras sharkIsLeft till true och då blir nästa if-condition uppfyllt.
-            if (!sharkIsLeft && position.X <= _graphics.PreferredBackBufferWidth - texture.Width / 2)
+            //position.Y -= speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (position.Y >= texture.Height && sharkIsGoingUp)
             {
-                // Flyttar shark
-                position.X -= speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                // Kontrollerar om shark har kommit till vänstra brytpunkten.
-                if (position.X <= texture.Width / 2 + 5)
+                position.Y -= speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                if (position.Y == texture.Height)
                 {
-                    // Sätter shark position så den inte åker utanför skärmen, samt sätter sharkIsLeft till true
-                    // vilket gör så att den yttre if-satsen blir falsk, och nästa if-sats blir sann.
-                    position.X = texture.Width / 2;
-                    sharkIsLeft = true;
+                    sharkIsGoingUp = false;
                 }
             }
-            if (sharkIsLeft && position.X >= texture.Width / 2)
-            {
-                position.X += speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-                if (position.X >= _graphics.PreferredBackBufferWidth - texture.Width / 2 - 5)
+            if (position.Y <= texture.Height && !sharkIsGoingUp)
+            {
+                position.Y += speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+                if (position.Y + texture.Height == _graphics.PreferredBackBufferHeight)
                 {
-                    position.X = _graphics.PreferredBackBufferWidth - texture.Width / 2;
-                    sharkIsLeft = false;
+                    sharkIsGoingUp = true;
                 }
             }
-            RectangleF sharkPos = new RectangleF(this.Position.X, this.Position.Y, this.Texture.Height, this.Texture.Width);
 
-            if (player.Position.IntersectsWith(sharkPos))
-            {
-                player.HP--;
-                drawShark = false;
-                sharkPos = new RectangleF(100, 100, 100, 100);
-                this.position.X = 0;
-                this.position.Y = 0;
-            }
+            //                 Originalkod                      ///
+            //// Kollar om shark inte är till vänster, och på rätt position av skärmen. När shark har kommit
+            //// hela vägen till vänster ändras sharkIsLeft till true och då blir nästa if-condition uppfyllt.
+            //if (!sharkIsLeft && position.X <= _graphics.PreferredBackBufferWidth - texture.Width / 2)
+            //{
+            //    // Flyttar shark
+            //    position.Y -= speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            //    // Kontrollerar om shark har kommit till vänstra brytpunkten.
+            //    if (position.X <= texture.Width / 2 + 5)
+            //    {
+            //        // Sätter shark position så den inte åker utanför skärmen, samt sätter sharkIsLeft till true
+            //        // vilket gör så att den yttre if-satsen blir falsk, och nästa if-sats blir sann.
+            //        position.X = texture.Width / 2;
+            //        sharkIsLeft = true;
+            //    }
+            //}
+            //if (sharkIsLeft && position.X >= texture.Width / 2)
+            //{
+            //    position.X += speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            //    if (position.X >= _graphics.PreferredBackBufferWidth - texture.Width / 2 - 5)
+            //    {
+            //        position.X = _graphics.PreferredBackBufferWidth - texture.Width / 2;
+            //        sharkIsLeft = false;
+            //    }
+            //}
+            //RectangleF sharkPos = new RectangleF(this.Position.X, this.Position.Y, this.Texture.Height, this.Texture.Width);
+
+            //if (player.Position.IntersectsWith(sharkPos))
+            //{
+            //    player.HP--;
+            //    drawShark = false;
+            //    sharkPos = new RectangleF(100, 100, 100, 100);
+            //    this.position.X = 0;
+            //    this.position.Y = 0;
+            //}
             if (player.HP < 1)
             {
-                GameLevel.ResetGame(game, gameTime, filePath, player, healthCounter, powerUpList, sharkList);
+                GameLevel.ResetGame(game, gameTime, filePath, player, healthCounter, powerUpList, sharkList, hedgehog);
             }
             return currentFrameIndex;
         }
