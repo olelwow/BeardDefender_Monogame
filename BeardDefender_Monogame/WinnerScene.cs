@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using BeardDefender_Monogame.GameObjects;
 
 namespace BeardDefender_Monogame
 {
@@ -9,6 +10,7 @@ namespace BeardDefender_Monogame
         //Olika layers för att skapa bakgrunden i spelet.
         private Texture2D winnerbackground;
         private SpriteFont scoreFont;
+        
 
         public void LoadContent(ContentManager Content)
         {
@@ -27,6 +29,8 @@ namespace BeardDefender_Monogame
             //till samma storlek som spelytan.
             Vector2 desiredSize = new Vector2(MapWidth, MapHeight);
             Rectangle destinationRectangle = new Rectangle(0, 0, (int)desiredSize.X, (int)desiredSize.Y);
+            System.Drawing.RectangleF player = new System.Drawing.RectangleF(100, 100, 100, 100);
+            Player playerOne = new Player(player);
             //Vector2 scale = new Vector2(20f, 20f);
 
             _spriteBatch.Draw(winnerbackground, destinationRectangle, Color.White);

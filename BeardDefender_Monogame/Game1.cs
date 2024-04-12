@@ -78,6 +78,9 @@ namespace BeardDefender_Monogame
         Background backgroundLeft;
         Background backgroundLeft2;
 
+        // Sea objects
+        Sea seaTile1;
+        Sea seaTile2;
 
         // Unit objects
         Shark shark;
@@ -132,7 +135,6 @@ namespace BeardDefender_Monogame
                 shark2 
             };
             crabman = new Crabman();
-            hedgehog = new Hedgehog(new Vector2(400, 640 - 50), Content.Load<Texture2D>("Hedgehog_Right"), 0.03f);
 
             // Background
             background = new Background(startX, GraphicsDevice.Viewport.Width);
@@ -179,6 +181,11 @@ namespace BeardDefender_Monogame
                         660,
                         80));
             }
+            //Sea tiles
+            seaTile1 = new Sea(new Vector2(1100, 620));
+            seaTile2 = new Sea(new Vector2(300, 620));
+
+            hedgehog = new Hedgehog(new Vector2(400, 620));
             base.Initialize();
         }
         protected override void LoadContent()
@@ -186,7 +193,7 @@ namespace BeardDefender_Monogame
             //Laddar musikfilen
             ContentManager content = new ContentManager(this.Services, "Content");
             backgroundMusic = content.Load<Song>("BitGame");
-            MediaPlayer.Volume = 0.05f;
+            MediaPlayer.Volume = 0f;
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
@@ -226,12 +233,18 @@ namespace BeardDefender_Monogame
 
             //Texturer för crabman
             crabman.LoadContent(Content);
+            //Texturer för hedgehog
+            hedgehog.LoadContent(Content);
 
             // Texturer för shark
             foreach (Shark shark in sharkList)
             {
                 shark.LoadContent(Content);
             }
+
+            //Texturer för sea
+            seaTile1.LoadContent(Content);
+            seaTile2.LoadContent(Content);
 
             // Ground
             foreach (Ground ground in groundList)
@@ -293,12 +306,13 @@ namespace BeardDefender_Monogame
                                     player,
                                     healthCounter,
                                     powerUpList,
-                                    sharkList);
+                                    sharkList,
+                                    hedgehog);
                             }
 
                             if (levelTimer >= LevelTimeLimit)
                             {
-                                LevelOne.ChangeLevel(this, powerUpList, shark, shark2);
+                                LevelOne.ChangeLevel(this, powerUpList, shark, shark2, hedgehog);
                             }
 
                             LevelOne.Update
@@ -311,6 +325,8 @@ namespace BeardDefender_Monogame
                                 backgroundList,
                                 player,
                                 groundList,
+                                seaTile1,
+                                seaTile2,
                                 hedgehog,
                                 crabman,
                                 sharkList,
@@ -332,7 +348,7 @@ namespace BeardDefender_Monogame
                             if (player.position.X <= crabman.PositionX + 125 && player.position.Y <= crabman.PositionY + 100)
                             {
                                 player.HP = 0;
-                                GameLevel.ResetGame(this, gameTime, filePath, player, healthCounter, powerUpList, sharkList);
+                                GameLevel.ResetGame(this, gameTime, filePath, player, healthCounter, powerUpList, sharkList, hedgehog);
                             }
                             if (levelTimer >= LevelTimeLimit)
                             {
@@ -343,7 +359,8 @@ namespace BeardDefender_Monogame
                                     player,
                                     healthCounter,
                                     powerUpList,
-                                    sharkList);
+                                    sharkList,
+                                    hedgehog);
                             }
                             LevelTwo.Update
                                 (this,
@@ -412,6 +429,8 @@ namespace BeardDefender_Monogame
                         _spriteBatch,
                         backgroundList,
                         groundList,
+                        seaTile1,
+                        seaTile2,
                         powerUpList,
                         player,
                         crabman,

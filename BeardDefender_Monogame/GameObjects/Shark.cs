@@ -21,6 +21,7 @@ namespace BeardDefender_Monogame.GameObjects
         float frameDuration = 0.2f; // Hastighet på animationen.
         float frameTimer = 0f;
         private bool drawShark;
+        private bool sharkIsGoingUp = true;
 
         public Shark(Vector2 position)
         {
@@ -51,6 +52,7 @@ namespace BeardDefender_Monogame.GameObjects
             string filePath,
             List<PowerUp> powerUpList,
             List<Shark> sharkList,
+            Hedgehog hedgehog,
             HealthCounter healthCounter)
         {
             // Uppdatera frameTimer
@@ -64,6 +66,29 @@ namespace BeardDefender_Monogame.GameObjects
                 frameTimer = 0f;
             }
 
+
+            ///       Test for sharks upwardsmotion
+            ////position.Y -= speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            //if (position.Y >= texture.Height && sharkIsGoingUp)
+            //{
+            //    position.Y -= speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            //    if (position.Y == texture.Height)
+            //    {
+            //        sharkIsGoingUp = false;
+            //    }
+            //}
+
+            //if (position.Y <= texture.Height && !sharkIsGoingUp)
+            //{
+            //    position.Y += speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            //    if (position.Y + texture.Height == _graphics.PreferredBackBufferHeight)
+            //    {
+            //        sharkIsGoingUp = true;
+            //    }
+            //}
+
+            //                 Originalkod                      ///
             // Kollar om shark inte är till vänster, och på rätt position av skärmen. När shark har kommit
             // hela vägen till vänster ändras sharkIsLeft till true och då blir nästa if-condition uppfyllt.
             if (!sharkIsLeft && position.X <= _graphics.PreferredBackBufferWidth - texture.Width / 2)
@@ -101,7 +126,7 @@ namespace BeardDefender_Monogame.GameObjects
             }
             if (player.HP < 1)
             {
-                GameLevel.ResetGame(game, gameTime, filePath, player, healthCounter, powerUpList, sharkList);
+                GameLevel.ResetGame(game, gameTime, filePath, player, healthCounter, powerUpList, sharkList, hedgehog);
             }
             return currentFrameIndex;
         }

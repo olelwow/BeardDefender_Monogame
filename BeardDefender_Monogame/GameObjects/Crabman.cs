@@ -42,6 +42,7 @@ namespace BeardDefender_Monogame.GameObjects
             string filePath,
             List<PowerUp> powerUpList,
             List<Shark> sharkList,
+            Hedgehog hedgehog,
             HealthCounter healthCounter)
         {
             // Uppdatera frameTimer

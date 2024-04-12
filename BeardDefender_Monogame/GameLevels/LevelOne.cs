@@ -33,6 +33,8 @@ namespace BeardDefender_Monogame.GameLevels
             List<Background> backgroundList,
             Player player,
             List<Ground> groundList,
+            Sea seaTile1,
+            Sea seaTile2,
             Hedgehog hedgehog,
             Crabman crabman,
             List<Shark> sharkList,
@@ -52,11 +54,13 @@ namespace BeardDefender_Monogame.GameLevels
                     background.Update(gameTime, isPlayerMoving, playerSpeed, playerDirection);
                 }
             }
-            // Uppdatera spelarposition, fiender, osv.
-            foreach (Ground ground in groundList)
-            {
-                ground.Update(gameTime, graphicsDevice.Viewport.Width);
-            }
+            seaTile1.Update(gameTime);
+            seaTile2.Update(gameTime);
+            //// Uppdatera spelarposition, fiender, osv.
+            //foreach (Ground ground in groundList)
+            //{
+            //    ground.Update(gameTime, graphicsDevice.Viewport.Width);
+            //}
             // Player movement, sätter players variabel IsFacingRight till returvärdet av
             // metoden, som håller koll på vilket håll spelaren är riktad åt.
             player.IsFacingRight =
@@ -68,15 +72,15 @@ namespace BeardDefender_Monogame.GameLevels
                     (JumpBoost)powerUpList[1]);
 
             //returnerar rätt frame index som används i Update.
-            crabman.CurrentFrameIndex = crabman.Update(_graphics, gameTime, player, game, filePath, powerUpList, sharkList, healthCounter);
-
+            crabman.CurrentFrameIndex = crabman.Update(_graphics, gameTime, player, game, filePath, powerUpList, sharkList, hedgehog, healthCounter);
             // Shark movement, returnerar rätt frame index som används i Update.
             
             foreach (Shark shark in sharkList)
             {
-                shark.CurrentFrameIndex = shark.Update(_graphics, gameTime, player, game, filePath, powerUpList, sharkList, healthCounter);
+                shark.CurrentFrameIndex = shark.Update(_graphics, gameTime, player, game, filePath, powerUpList, sharkList, hedgehog, healthCounter);
             }
 
+            hedgehog.CurrentFrameIndex = hedgehog.Update(_graphics, gameTime, player, game, filePath, powerUpList, sharkList, hedgehog, healthCounter);
             //Updaterar score i sammaband med spelets timer
             Game1.score += (double)gameTime.ElapsedGameTime.TotalSeconds;
 
@@ -94,6 +98,8 @@ namespace BeardDefender_Monogame.GameLevels
             SpriteBatch _spriteBatch,
             List<Background> backgroundList,
             List<Ground> groundList,
+            Sea seaTile1,
+            Sea seaTile2,
             List<PowerUp> powerUpList,
             Player player,
             Crabman crabman,
@@ -130,6 +136,10 @@ namespace BeardDefender_Monogame.GameLevels
                 item.Draw(_spriteBatch);
             }
 
+            //Sea
+            seaTile1.Draw(_spriteBatch);
+            seaTile2.Draw(_spriteBatch);
+
             foreach (PowerUp powerUp in powerUpList)
             {
                 if (!powerUp.Taken)
@@ -139,7 +149,7 @@ namespace BeardDefender_Monogame.GameLevels
             }
             healthCounter.Draw(_spriteBatch);
         }
-        public static void ChangeLevel (Game1 game, List<PowerUp> powerUpList, Shark shark, Shark shark2)
+        public static void ChangeLevel (Game1 game, List<PowerUp> powerUpList, Shark shark, Shark shark2, Hedgehog hedgehog)
         {
             game.ActiveScenes = Scenes.LEVEL_TWO;
             game.LevelTimer = 0;
@@ -155,6 +165,8 @@ namespace BeardDefender_Monogame.GameLevels
             shark.DrawShark = true;
             shark2.Position = new Vector2(300, 450);
             shark2.DrawShark = true;
+            hedgehog.Position = new Vector2(600, 620);
+            
         }
     }
 }
